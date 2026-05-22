@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Voyage Planner</title>
+  <meta name="theme-color" content="#0f5f63" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['class', '[data-theme="dark"]'],
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Instrument Serif', 'serif'],
+            sans: ['Inter', 'sans-serif']
+          },
+          colors: {
+            bg: '#f5f3ef',
+            surface: '#fbfaf7',
+            surface2: '#f1eeea',
+            borderc: '#d7d2ca',
+            textc: '#25221d',
+            muted: '#6f6b64',
+            faint: '#9f9a92',
+            accent: '#0f5f63',
+            accentsoft: '#d8e9e8',
+            darkbg: '#161513',
+            darksurface: '#1d1b18',
+            darksurface2: '#262320',
+            darkborder: '#34312d',
+            darktext: '#ede8df',
+            darkmuted: '#aaa49a',
+            darkfaint: '#706b63',
+            darkaccent: '#66a5aa'
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(31, 27, 21, 0.06)',
+            float: '0 18px 60px rgba(17, 15, 12, 0.10)',
+            glass: '0 8px 28px rgba(15, 95, 99, 0.08)'
+          },
+          borderRadius: {
+            '4xl': '2rem'
+          },
+          keyframes: {
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(12px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            },
+            pulseDot: {
+              '0%, 100%': { transform: 'scale(1)', opacity: '0.8' },
+              '50%': { transform: 'scale(1.35)', opacity: '1' }
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' }
+            },
+            slideIn: {
+              '0%': { opacity: '0', transform: 'translateY(18px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            }
+          },
+          animation: {
+            fadeUp: 'fadeUp .45s cubic-bezier(0.16, 1, 0.3, 1)',
+            pulseDot: 'pulseDot 1.8s ease-in-out infinite',
+            shimmer: 'shimmer 1.8s linear infinite',
+            slideIn: 'slideIn .35s cubic-bezier(0.16, 1, 0.3, 1)'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+    }
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(15,95,99,0.05), transparent 28%),
+        linear-gradient(180deg, #f6f4f0 0%, #f1efea 100%);
+    }
+    html[data-theme="dark"] body {
+      background:
+        radial-gradient(circle at top left, rgba(102,165,170,0.10), transparent 24%),
+        linear-gradient(180deg, #161513 0%, #131210 100%);
+    }
+    .glass {
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .map-grid {
+      background-image:
+        linear-gradient(to right, rgba(15,95,99,0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(15,95,99,0.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    html[data-theme="dark"] .map-grid {
+      background-image:
+        linear-gradient(to right, rgba(102,165,170,0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(102,165,170,0.08) 1px, transparent 1px);
+    }
+    .route-air { border-color: #2f7d83; }
+    .route-train { border-color: #c68d39; }
+    .route-walk { border-color: #6d8c4f; }
+    .route-plane { border-color: #557ab8; }
+    .skeleton {
+      background: linear-gradient(90deg, rgba(180,176,169,.28) 25%, rgba(210,206,199,.52) 50%, rgba(180,176,169,.28) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.8s linear infinite;
+    }
+    html[data-theme="dark"] .skeleton {
+      background: linear-gradient(90deg, rgba(72,68,64,.35) 25%, rgba(92,88,82,.55) 50%, rgba(72,68,64,.35) 75%);
+      background-size: 200% 100%;
+    }
+  </style>
+</head>
+<body class="font-sans text-textc dark:text-darktext min-h-screen">
+  <div id="app" class="min-h-screen">
+    <div class="mx-auto max-w-[1600px] px-3 pb-28 pt-3 sm:px-4 lg:px-6 lg:pb-8">
+      <header class="sticky top-3 z-40 mb-4 rounded-[28px] border border-borderc/70 bg-surface/90 px-4 py-3 shadow-soft glass dark:border-darkborder dark:bg-darksurface/88 lg:px-5">
+        <div class="flex items-center gap-3">
+          <button class="hidden h-11 w-11 items-center justify-center rounded-2xl border border-borderc bg-white text-muted transition hover:border-accent/30 hover:text-accent dark:border-darkborder dark:bg-darksurface2 dark:text-darkmuted lg:flex" aria-label="Retour à l'accueil">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 18l-6-6 6-6"/><path d="M9 12h10"/></svg>
+          </button>
+
+          <div class="flex min-w-0 flex-1 items-center gap-3">
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent text-white shadow-glass dark:bg-darkaccent dark:text-slate-950">
+              <svg viewBox="0 0 32 32" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M5 22c6-10 10-12 22-17-3 12-7 16-17 22l-4-5Z" />
+                <path d="M11 21l4-4" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <h1 class="truncate text-[1.1rem] font-medium tracking-[-0.02em] lg:text-[1.25rem]">Voyage Planner</h1>
+                <div class="hidden items-center gap-1 rounded-full bg-accentsoft px-2.5 py-1 text-[11px] font-medium text-accent dark:bg-darksurface2 dark:text-darkaccent sm:flex">
+                  <span class="h-1.5 w-1.5 rounded-full bg-accent animate-pulseDot dark:bg-darkaccent"></span>
+                  Sauvegardé
+                </div>
+              </div>
+              <p class="truncate text-xs text-muted dark:text-darkmuted">Planifiez, budgétez, gardez vos documents et suivez votre itinéraire.</p>
+            </div>
+          </div>
+
+          <div class="hidden items-center gap-2 md:flex">
+            <button class="rounded-2xl border border-borderc bg-white px-3 py-2 text-sm font-medium text-textc transition hover:border-accent/30 hover:text-accent dark:border-darkborder dark:bg-darksurface2 dark:text-darktext">Mode lecture</button>
+            <button id="themeToggle" class="h-11 w-11 rounded-2xl border border-borderc bg-white text-muted transition hover:border-accent/30 hover:text-accent dark:border-darkborder dark:bg-darksurface2 dark:text-darkmuted" aria-label="Basculer le thème">
+              <svg class="mx-auto h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v2"/><path d="M12 19v2"/><path d="M4.22 4.22l1.42 1.42"/><path d="M18.36 18.36l1.42 1.42"/><path d="M3 12h2"/><path d="M19 12h2"/><path d="M4.22 19.78l1.42-1.42"/><path d="M18.36 5.64l1.42-1.42"/><circle cx="12" cy="12" r="4.5"/></svg>
+              <svg class="mx-auto hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3c0 0-1.21 7.79 9.79 9.79Z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-borderc/70 pt-3 dark:border-darkborder/80">
+          <button class="inline-flex items-center gap-2 rounded-2xl border border-borderc bg-white px-3 py-2 text-sm font-medium text-textc shadow-sm transition hover:border-accent/30 hover:text-accent dark:border-darkborder dark:bg-darksurface2 dark:text-darktext">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-xl bg-accentsoft text-[11px] font-semibold text-accent dark:bg-darksurface dark:text-darkaccent">JP</span>
+            Japon — Avril 2027
+            <svg class="h-4 w-4 text-muted dark:text-darkmuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <button class="rounded-2xl border border-dashed border-borderc px-3 py-2 text-sm font-medium text-muted transition hover:border-accent/40 hover:text-accent dark:border-darkborder dark:text-darkmuted dark:hover:text-darkaccent">+ Nouveau voyage</button>
+          <div class="ml-auto hidden items-center gap-2 sm:flex">
+            <button class="rounded-2xl px-3 py-2 text-sm text-muted transition hover:bg-surface2 hover:text-textc dark:text-darkmuted dark:hover:bg-darksurface2 dark:hover:text-darktext">Créer</button>
+            <button class="rounded-2xl px-3 py-2 text-sm text-muted transition hover:bg-surface2 hover:text-textc dark:text-darkmuted dark:hover:bg-darksurface2 dark:hover:text-darktext">Partager</button>
+            <button class="rounded-2xl px-3 py-2 text-sm text-rose-700 transition hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-950/30">Supprimer</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="grid gap-4 lg:grid-cols-[280px,minmax(0,1fr),340px] xl:grid-cols-[300px,minmax(0,1fr),360px]">
+        <aside class="hidden lg:block">
+          <div class="rounded-[28px] border border-borderc bg-surface/92 p-4 shadow-soft dark:border-darkborder dark:bg-darksurface">
+            <div class="mb-4 flex items-center justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">Voyage actif</p>
+                <h2 class="mt-1 font-display text-[1.55rem] leading-none">Kyoto & Tokyo</h2>
+              </div>
+              <button class="rounded-xl border border-borderc p-2 text-muted transition hover:text-accent dark:border-darkborder dark:text-darkmuted dark:hover:text-darkaccent">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              </button>
+            </div>
+
+            <div class="space-y-2">
+              <div class="rounded-2xl bg-accentsoft/70 p-3 dark:bg-darksurface2">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-xs text-muted dark:text-darkmuted">21 jours</p>
+                    <p class="text-sm font-semibold">18 étapes • 6 lieux clés</p>
+                  </div>
+                  <span class="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-medium text-accent dark:bg-darkbg dark:text-darkaccent">Aujourd'hui</span>
+                </div>
+              </div>
+
+              <button class="flex w-full items-center gap-3 rounded-2xl bg-white px-3 py-3 text-left shadow-sm ring-1 ring-accent/15 transition dark:bg-darksurface2">
+                <span class="flex h-9 w-9 items-center justify-center rounded-2xl bg-accent text-sm font-semibold text-white dark:bg-darkaccent dark:text-slate-950">01</span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-medium">Arrivée à Tokyo</p>
+                  <p class="truncate text-xs text-muted dark:text-darkmuted">2 étapes • Ven. 12 avr.</p>
+                </div>
+              </button>
+
+              <button class="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-surface2 dark:hover:bg-darksurface2">
+                <span class="flex h-9 w-9 items-center justify-center rounded-2xl border border-borderc text-sm font-semibold text-muted dark:border-darkborder dark:text-darkmuted">02</span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-medium">Asakusa & Ueno</p>
+                  <p class="truncate text-xs text-muted dark:text-darkmuted">4 étapes • Sam. 13 avr.</p>
+                </div>
+              </button>
+
+              <button class="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-surface2 dark:hover:bg-darksurface2">
+                <span class="flex h-9 w-9 items-center justify-center rounded-2xl border border-borderc text-sm font-semibold text-muted dark:border-darkborder dark:text-darkmuted">03</span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-medium">Train vers Kyoto</p>
+                  <p class="truncate text-xs text-muted dark:text-darkmuted">3 étapes • Dim. 14 avr.</p>
+                </div>
+              </button>
+            </div>
+
+            <div class="mt-5 rounded-2xl border border-borderc/70 bg-white p-4 dark:border-darkborder dark:bg-darksurface2">
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-semibold">Raccourcis</p>
+                <span class="text-xs text-muted dark:text-darkmuted">PWA</span>
+              </div>
+              <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+                <button class="rounded-2xl bg-surface2 px-3 py-3 text-left transition hover:bg-accentsoft dark:bg-darkbg dark:hover:bg-darkbg/70">+ Étape</button>
+                <button class="rounded-2xl bg-surface2 px-3 py-3 text-left transition hover:bg-accentsoft dark:bg-darkbg dark:hover:bg-darkbg/70">Carte</button>
+                <button class="rounded-2xl bg-surface2 px-3 py-3 text-left transition hover:bg-accentsoft dark:bg-darkbg dark:hover:bg-darkbg/70">Document</button>
+                <button class="rounded-2xl bg-surface2 px-3 py-3 text-left transition hover:bg-accentsoft dark:bg-darkbg dark:hover:bg-darkbg/70">Dépense</button>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="space-y-4">
+          <div class="rounded-[30px] border border-borderc bg-surface/94 p-4 shadow-soft dark:border-darkborder dark:bg-darksurface lg:p-5">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-faint dark:text-darkfaint">Plan</p>
+                <div class="mt-2 flex flex-wrap items-center gap-3">
+                  <h2 class="font-display text-[2rem] leading-none tracking-[-0.03em] lg:text-[2.3rem]">Kyoto & Tokyo</h2>
+                  <span class="rounded-full bg-accentsoft px-3 py-1.5 text-xs font-medium text-accent dark:bg-darksurface2 dark:text-darkaccent">21 jours</span>
+                  <span class="rounded-full bg-surface2 px-3 py-1.5 text-xs font-medium text-muted dark:bg-darksurface2 dark:text-darkmuted">18 étapes</span>
+                </div>
+                <p class="mt-3 max-w-2xl text-sm text-muted dark:text-darkmuted">Un itinéraire mobile-first qui rassemble journées, budget, documents et carte dans une seule expérience calme et premium.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button class="rounded-2xl border border-borderc bg-white px-3.5 py-2.5 text-sm font-medium transition hover:border-accent/30 hover:text-accent dark:border-darkborder dark:bg-darksurface2 dark:hover:text-darkaccent">Modifier les dates</button>
+                <button class="rounded-2xl border border-borderc bg-white px-3.5 py-2.5 text-sm font-medium transition hover:border-accent/30 hover:text-accent dark:border-darkborder dark:bg-darksurface2 dark:hover:text-darkaccent">Export JSON</button>
+                <button class="rounded-2xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#0c4f53] dark:bg-darkaccent dark:text-slate-950">Ajouter une étape</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid gap-4 xl:grid-cols-[minmax(0,1fr),300px]">
+            <div class="space-y-4">
+              <article class="rounded-[30px] border border-borderc bg-surface p-4 shadow-soft animate-fadeUp dark:border-darkborder dark:bg-darksurface lg:p-5">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="rounded-full bg-accentsoft px-2.5 py-1 text-[11px] font-semibold tracking-[0.14em] text-accent dark:bg-darksurface2 dark:text-darkaccent">JOUR 02</span>
+                      <span class="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-medium text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">Aujourd'hui</span>
+                    </div>
+                    <h3 class="mt-3 text-lg font-semibold tracking-[-0.02em]">Asakusa & Ueno</h3>
+                    <p class="mt-1 text-sm text-muted dark:text-darkmuted">Samedi 13 avril • 4 étapes • Journée culturelle et flânerie</p>
+                  </div>
+                  <button class="rounded-2xl border border-borderc bg-white px-3 py-2 text-sm font-medium text-textc transition hover:text-accent dark:border-darkborder dark:bg-darksurface2 dark:text-darktext dark:hover:text-darkaccent">Réduire</button>
+                </div>
+
+                <p class="mt-4 rounded-2xl bg-surface2 px-4 py-3 text-sm text-muted dark:bg-darksurface2 dark:text-darkmuted">Commencer tôt au temple Senso-ji, garder le déjeuner léger près du parc d'Ueno, puis terminer avec une balade photo au coucher de soleil.</p>
+
+                <div class="mt-5 space-y-3 border-l border-borderc pl-4 dark:border-darkborder sm:pl-5">
+                  <div class="relative rounded-[24px] border border-borderc bg-white p-4 shadow-sm transition hover:shadow-soft dark:border-darkborder dark:bg-darksurface2">
+                    <span class="absolute -left-[28px] top-8 h-3 w-3 rounded-full bg-accent ring-4 ring-bg dark:bg-darkaccent dark:ring-darkbg"></span>
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <span class="rounded-full bg-surface2 px-2.5 py-1 text-xs font-medium text-muted dark:bg-darkbg dark:text-darkmuted">08:30</span>
+                          <span class="rounded-full bg-accentsoft px-2.5 py-1 text-xs font-medium text-accent dark:bg-darkbg dark:text-darkaccent">Pied</span>
+                          <span class="rounded-full bg-surface2 px-2.5 py-1 text-xs font-medium text-muted dark:bg-darkbg dark:text-darkmuted">¥0</span>
+                        </div>
+                        <h4 class="mt-3 text-base font-semibold">Senso-ji et Nakamise-dori</h4>
+                        <p class="mt-1 text-sm text-muted dark:text-darkmuted">Asakusa, Tokyo • Temple + marché historique</p>
+                        <p class="mt-3 text-sm leading-6 text-muted dark:text-darkmuted">Arriver avant l'affluence. Prendre 30 minutes pour les photos sous la porte Kaminarimon puis café rapide avant le trajet suivant.</p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                          <a href="#" class="rounded-full bg-surface2 px-3 py-1.5 text-xs font-medium text-textc dark:bg-darkbg dark:text-darktext">Lien utile</a>
+                          <span class="rounded-full bg-surface2 px-3 py-1.5 text-xs text-muted dark:bg-darkbg dark:text-darkmuted">Checklist: billets • photos • météo</span>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <button class="rounded-2xl border border-borderc px-3 py-2 text-sm text-muted transition hover:text-accent dark:border-darkborder dark:text-darkmuted dark:hover:text-darkaccent">Carte</button>
+                        <button class="rounded-2xl border border-borderc px-3 py-2 text-sm text-muted transition hover:text-accent dark:border-darkborder dark:text-darkmuted dark:hover:text-darkaccent">Modifier</button>
+                        <button class="rounded-2xl border border-rose-200 px-3 py-2 text-sm text-rose-700 transition hover:bg-rose-50 dark:border-rose-900/40 dark:text-rose-300">Supprimer</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="relative rounded-[24px] border border-borderc bg-white p-4 shadow-sm transition hover:shadow-soft dark:border-darkborder dark:bg-darksurface2">
+                    <span class="absolute -left-[28px] top-8 h-3 w-3 rounded-full bg-[#c68d39] ring-4 ring-bg dark:ring-darkbg"></span>
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <span class="rounded-full bg-surface2 px-2.5 py-1 text-xs font-medium text-muted dark:bg-darkbg dark:text-darkmuted">11:00</span>
+                          <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">Train</span>
+                          <span class="rounded-full bg-surface2 px-2.5 py-1 text-xs font-medium text-muted dark:bg-darkbg dark:text-darkmuted">¥380</span>
+                        </div>
+                        <h4 class="mt-3 text-base font-semibold">Parc d'Ueno et musée national</h4>
+                        <p class="mt-1 text-sm text-muted dark:text-darkmuted">Ueno, Tokyo • Déplacement + visite</p>
+                        <div class="mt-3 flex items-center gap-3 overflow-hidden rounded-[22px] border border-borderc bg-surface2 p-2 dark:border-darkborder dark:bg-darkbg">
+                          <div class="h-16 w-20 shrink-0 rounded-2xl bg-[linear-gradient(135deg,#c5d9d7,#e5eeec)] dark:bg-[linear-gradient(135deg,#375457,#283638)]"></div>
+                          <div class="min-w-0">
+                            <p class="text-sm font-medium">Aperçu photo</p>
+                            <p class="truncate text-xs text-muted dark:text-darkmuted">Vue du parc et du bassin central</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <button class="rounded-2xl border border-borderc px-3 py-2 text-sm text-muted transition hover:text-accent dark:border-darkborder dark:text-darkmuted dark:hover:text-darkaccent">Ouvrir</button>
+                        <button class="rounded-2xl border border-borderc px-3 py-2 text-sm text-muted transition hover:text-accent dark:border-darkborder dark:text-darkmuted dark:hover:text-darkaccent">Modifier</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="relative rounded-[24px] border border-dashed border-borderc bg-surface2/70 p-4 dark:border-darkborder dark:bg-darksurface2/60">
+                    <span class="absolute -left-[28px] top-8 h-3 w-3 rounded-full bg-white ring-4 ring-bg dark:bg-darksurface2 dark:ring-darkbg"></span>
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p class="text-sm font-medium">Ajouter une nouvelle étape</p>
+                        <p class="text-xs text-muted dark:text-darkmuted">Temps, lieu, transport, note et budget associé.</p>
+                      </div>
+                      <button class="rounded-2xl bg-accent px-4 py-2.5 text-sm font-medium text-white dark:bg-darkaccent dark:text-slate-950">Ajouter une étape</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-5 grid gap-3 md:grid-cols-3">
+                  <div class="rounded-2xl border border-borderc bg-white p-4 dark:border-darkborder dark:bg-darksurface2">
+                    <p class="text-xs uppercase tracking-[0.14em] text-faint dark:text-darkfaint">Transport</p>
+                    <p class="mt-2 text-sm font-semibold">Train local • 25 min</p>
+                    <p class="mt-1 text-xs text-muted dark:text-darkmuted">Pass Suica • lien utile</p>
+                  </div>
+                  <div class="rounded-2xl border border-borderc bg-white p-4 dark:border-darkborder dark:bg-darksurface2">
+                    <p class="text-xs uppercase tracking-[0.14em] text-faint dark:text-darkfaint">Logement</p>
+                    <p class="mt-2 text-sm font-semibold">Mimaru Tokyo Ueno East</p>
+                    <p class="mt-1 text-xs text-muted dark:text-darkmuted">Check-in 15:00 • réservation</p>
+                  </div>
+                  <div class="rounded-2xl border border-borderc bg-white p-4 dark:border-darkborder dark:bg-darksurface2">
+                    <p class="text-xs uppercase tracking-[0.14em] text-faint dark:text-darkfaint">Note générale</p>
+                    <p class="mt-2 text-sm text-muted dark:text-darkmuted">Prévoir batterie externe et espèces pour les petits achats.</p>
+                  </div>
+                </div>
+              </article>
+
+              <article class="rounded-[30px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface lg:p-5">
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="rounded-full bg-surface2 px-2.5 py-1 text-[11px] font-semibold tracking-[0.14em] text-muted dark:bg-darksurface2 dark:text-darkmuted">JOUR 03</span>
+                      <span class="rounded-full bg-surface2 px-2.5 py-1 text-[11px] font-medium text-muted dark:bg-darksurface2 dark:text-darkmuted">Demain</span>
+                    </div>
+                    <h3 class="mt-3 text-lg font-semibold tracking-[-0.02em]">Train vers Kyoto</h3>
+                    <p class="mt-1 text-sm text-muted dark:text-darkmuted">Dimanche 14 avril • 3 étapes</p>
+                  </div>
+                  <button class="rounded-2xl border border-borderc bg-white px-3 py-2 text-sm font-medium text-textc transition hover:text-accent dark:border-darkborder dark:bg-darksurface2 dark:text-darktext dark:hover:text-darkaccent">Développer</button>
+                </div>
+              </article>
+            </div>
+
+            <div class="space-y-4">
+              <div class="rounded-[28px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">Carte</p>
+                    <h3 class="mt-1 text-lg font-semibold">Itinéraire</h3>
+                  </div>
+                  <button class="rounded-2xl border border-borderc px-3 py-2 text-sm text-muted transition hover:text-accent dark:border-darkborder dark:text-darkmuted dark:hover:text-darkaccent">Ouvrir</button>
+                </div>
+                <div class="map-grid mt-4 overflow-hidden rounded-[24px] border border-borderc bg-[linear-gradient(180deg,#eff5f4,#f9faf8)] p-4 dark:border-darkborder dark:bg-[linear-gradient(180deg,#1c2223,#171817)]">
+                  <div class="relative h-64 rounded-[20px] bg-[radial-gradient(circle_at_20%_20%,rgba(15,95,99,0.08),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(198,141,57,0.1),transparent_25%),linear-gradient(180deg,rgba(255,255,255,0.34),rgba(255,255,255,0.1))] dark:bg-[radial-gradient(circle_at_20%_20%,rgba(102,165,170,0.12),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(198,141,57,0.12),transparent_25%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02))]">
+                    <svg class="absolute inset-0 h-full w-full" viewBox="0 0 300 220" fill="none">
+                      <path d="M42 146C78 124 96 100 127 90C159 79 171 80 204 99C230 114 243 136 268 148" stroke="#0f5f63" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="1 0" opacity="0.9"/>
+                      <path d="M46 150C73 171 92 182 132 183C163 183 192 167 224 151" stroke="#c68d39" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 9" opacity="0.9"/>
+                      <circle cx="42" cy="146" r="8" fill="#0f5f63"/>
+                      <circle cx="127" cy="90" r="8" fill="#c68d39"/>
+                      <circle cx="204" cy="99" r="8" fill="#6d8c4f"/>
+                      <circle cx="268" cy="148" r="8" fill="#557ab8"/>
+                    </svg>
+                    <div class="absolute left-4 top-4 rounded-2xl border border-white/40 bg-white/75 px-3 py-2 text-xs shadow-sm backdrop-blur dark:border-white/10 dark:bg-black/25">
+                      <p class="font-medium">Senso-ji</p>
+                      <p class="text-muted dark:text-darkmuted">08:30 • Asakusa</p>
+                    </div>
+                    <div class="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/40 bg-white/70 p-3 text-xs shadow-sm backdrop-blur dark:border-white/10 dark:bg-black/25">
+                      <div class="flex flex-wrap gap-2">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/10"><span class="h-2 w-2 rounded-full bg-accent"></span>Pied</span>
+                        <span class="inline-flex items-center gap-2 rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/10"><span class="h-2 w-2 rounded-full bg-[#c68d39]"></span>Train</span>
+                        <span class="inline-flex items-center gap-2 rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/10"><span class="h-2 w-2 rounded-full bg-[#557ab8]"></span>Avion</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-[28px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">Documents</p>
+                    <h3 class="mt-1 text-lg font-semibold">Références rapides</h3>
+                  </div>
+                  <button class="rounded-xl border border-borderc p-2 text-muted transition hover:text-accent dark:border-darkborder dark:text-darkmuted dark:hover:text-darkaccent">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                  </button>
+                </div>
+                <div class="mt-4 space-y-2">
+                  <div class="rounded-2xl border border-borderc bg-white p-3 dark:border-darkborder dark:bg-darksurface2">
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <p class="text-xs text-muted dark:text-darkmuted">Passeport</p>
+                        <p class="mt-1 text-sm font-medium">Numéro et photo de secours</p>
+                      </div>
+                      <button class="text-xs text-muted dark:text-darkmuted">Modifier</button>
+                    </div>
+                  </div>
+                  <div class="rounded-2xl border border-borderc bg-white p-3 dark:border-darkborder dark:bg-darksurface2">
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <p class="text-xs text-muted dark:text-darkmuted">Billet</p>
+                        <p class="mt-1 text-sm font-medium">Shinkansen Tokyo → Kyoto</p>
+                      </div>
+                      <button class="text-xs text-muted dark:text-darkmuted">Ouvrir</button>
+                    </div>
+                  </div>
+                  <div class="rounded-2xl border border-dashed border-borderc p-4 text-center dark:border-darkborder">
+                    <p class="text-sm font-medium">Aucun document</p>
+                    <p class="mt-1 text-xs text-muted dark:text-darkmuted">Ajoutez assurance, réservation ou lien important.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="rounded-[30px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface lg:p-5">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">Budget</p>
+                <h3 class="mt-1 text-lg font-semibold">Vue synthèse</h3>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <span class="rounded-full bg-surface2 px-3 py-1.5 text-xs font-medium text-textc dark:bg-darksurface2 dark:text-darktext">Mathis</span>
+                <span class="rounded-full bg-accentsoft px-3 py-1.5 text-xs font-medium text-accent dark:bg-darksurface2 dark:text-darkaccent">Emma</span>
+                <button class="rounded-full border border-dashed border-borderc px-3 py-1.5 text-xs font-medium text-muted dark:border-darkborder dark:text-darkmuted">+ Ajouter</button>
+              </div>
+            </div>
+
+            <div class="mt-4 grid gap-3 md:grid-cols-4">
+              <div class="rounded-[24px] bg-white p-4 shadow-sm dark:bg-darksurface2">
+                <p class="text-xs text-muted dark:text-darkmuted">Total dépensé</p>
+                <p class="mt-2 text-2xl font-semibold tracking-[-0.03em]">2 480 €</p>
+              </div>
+              <div class="rounded-[24px] bg-white p-4 shadow-sm dark:bg-darksurface2">
+                <p class="text-xs text-muted dark:text-darkmuted">Dépenses</p>
+                <p class="mt-2 text-2xl font-semibold tracking-[-0.03em]">18</p>
+              </div>
+              <div class="rounded-[24px] bg-white p-4 shadow-sm dark:bg-darksurface2">
+                <p class="text-xs text-muted dark:text-darkmuted">Écart</p>
+                <p class="mt-2 text-2xl font-semibold tracking-[-0.03em]">126 €</p>
+              </div>
+              <div class="rounded-[24px] bg-white p-4 shadow-sm dark:bg-darksurface2">
+                <p class="text-xs text-muted dark:text-darkmuted">Remboursement</p>
+                <p class="mt-2 text-sm font-semibold">Emma doit 63 € à Mathis</p>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <aside class="space-y-4">
+          <div class="rounded-[28px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">Dépense rapide</p>
+                <h3 class="mt-1 text-lg font-semibold">Ajouter la dépense</h3>
+              </div>
+              <span class="rounded-full bg-accentsoft px-2.5 py-1 text-[11px] font-medium text-accent dark:bg-darksurface2 dark:text-darkaccent">Budget</span>
+            </div>
+            <div class="mt-4 space-y-3">
+              <div>
+                <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Catégorie</label>
+                <div class="rounded-2xl border border-borderc bg-white px-3 py-3 text-sm dark:border-darkborder dark:bg-darksurface2">Transport</div>
+              </div>
+              <div>
+                <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Description</label>
+                <div class="rounded-2xl border border-borderc bg-white px-3 py-3 text-sm text-faint dark:border-darkborder dark:bg-darksurface2 dark:text-darkfaint">Billets Shinkansen</div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Montant</label>
+                  <div class="rounded-2xl border border-borderc bg-white px-3 py-3 text-sm dark:border-darkborder dark:bg-darksurface2">148 €</div>
+                </div>
+                <div>
+                  <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Qui a payé ?</label>
+                  <div class="rounded-2xl border border-borderc bg-white px-3 py-3 text-sm dark:border-darkborder dark:bg-darksurface2">Mathis</div>
+                </div>
+              </div>
+              <div>
+                <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Pour qui ?</label>
+                <div class="flex flex-wrap gap-2">
+                  <span class="rounded-full bg-accent px-3 py-1.5 text-xs font-medium text-white dark:bg-darkaccent dark:text-slate-950">Tout le monde</span>
+                  <span class="rounded-full bg-surface2 px-3 py-1.5 text-xs font-medium dark:bg-darksurface2">Mathis</span>
+                  <span class="rounded-full bg-surface2 px-3 py-1.5 text-xs font-medium dark:bg-darksurface2">Emma</span>
+                </div>
+              </div>
+              <button class="w-full rounded-2xl bg-accent px-4 py-3 text-sm font-medium text-white transition hover:bg-[#0d4f53] dark:bg-darkaccent dark:text-slate-950">Ajouter la dépense</button>
+            </div>
+          </div>
+
+          <div class="rounded-[28px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">Écran documents</p>
+                <h3 class="mt-1 text-lg font-semibold">Liste éditable</h3>
+              </div>
+              <button class="rounded-2xl border border-borderc px-3 py-2 text-sm text-muted transition hover:text-accent dark:border-darkborder dark:text-darkmuted dark:hover:text-darkaccent">Créer</button>
+            </div>
+            <div class="mt-4 space-y-2">
+              <div class="rounded-2xl bg-white p-3 dark:bg-darksurface2">
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <p class="text-xs text-muted dark:text-darkmuted">Réservation</p>
+                    <p class="mt-1 text-sm font-medium">Ryokan Gion — lien Booking</p>
+                  </div>
+                  <button class="text-xs text-rose-700 dark:text-rose-300">Supprimer</button>
+                </div>
+              </div>
+              <div class="rounded-2xl bg-white p-3 dark:bg-darksurface2">
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <p class="text-xs text-muted dark:text-darkmuted">Assurance</p>
+                    <p class="mt-1 text-sm font-medium">Contrat AXA — PDF</p>
+                  </div>
+                  <button class="text-xs text-muted dark:text-darkmuted">Modifier</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-[28px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">Chargement</p>
+                <h3 class="mt-1 text-lg font-semibold">État skeleton</h3>
+              </div>
+            </div>
+            <div class="mt-4 space-y-3">
+              <div class="skeleton h-5 w-28 rounded-xl"></div>
+              <div class="skeleton h-20 rounded-[20px]"></div>
+              <div class="skeleton h-16 rounded-[20px]"></div>
+              <div class="skeleton h-16 rounded-[20px]"></div>
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <nav class="fixed inset-x-3 bottom-3 z-50 rounded-[28px] border border-borderc bg-surface/92 px-2 py-2 shadow-float glass dark:border-darkborder dark:bg-darksurface/92 lg:hidden">
+        <div class="grid grid-cols-4 gap-1 text-center text-[11px] font-medium">
+          <button class="rounded-2xl bg-accent px-2 py-3 text-white dark:bg-darkaccent dark:text-slate-950">
+            <div class="mx-auto mb-1 h-5 w-5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+            </div>
+            Plan
+          </button>
+          <button class="rounded-2xl px-2 py-3 text-muted dark:text-darkmuted">
+            <div class="mx-auto mb-1 h-5 w-5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 20 3 17V4l6 3 6-3 6 3v13l-6-3-6 3Z"/><path d="M9 7v13"/><path d="M15 4v13"/></svg>
+            </div>
+            Carte
+          </button>
+          <button class="rounded-2xl px-2 py-3 text-muted dark:text-darkmuted">
+            <div class="mx-auto mb-1 h-5 w-5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
+            </div>
+            Documents
+          </button>
+          <button class="rounded-2xl px-2 py-3 text-muted dark:text-darkmuted">
+            <div class="mx-auto mb-1 h-5 w-5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            Budget
+          </button>
+        </div>
+      </nav>
+
+      <div class="pointer-events-none fixed right-4 top-24 z-50 hidden w-[320px] lg:block">
+        <div class="pointer-events-auto rounded-[24px] border border-emerald-200 bg-white/95 p-4 shadow-float glass dark:border-emerald-900/40 dark:bg-darksurface/96 animate-slideIn">
+          <div class="flex items-start gap-3">
+            <div class="mt-0.5 flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div>
+              <p class="text-sm font-semibold">Lien de partage généré</p>
+              <p class="mt-1 text-xs text-muted dark:text-darkmuted">Votre voyage est prêt à être partagé en lecture seule.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="mt-6 grid gap-4 xl:grid-cols-2">
+        <div class="rounded-[30px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface lg:p-5">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">État vide</p>
+              <h3 class="mt-1 text-lg font-semibold">Accueil sans voyage</h3>
+            </div>
+            <span class="rounded-full bg-surface2 px-3 py-1.5 text-xs text-muted dark:bg-darksurface2 dark:text-darkmuted">Home</span>
+          </div>
+          <div class="mt-4 overflow-hidden rounded-[28px] border border-borderc bg-[linear-gradient(180deg,#fcfbf9,#f2efea)] p-6 dark:border-darkborder dark:bg-[linear-gradient(180deg,#1d1b18,#171614)]">
+            <div class="max-w-md">
+              <p class="text-xs uppercase tracking-[0.2em] text-faint dark:text-darkfaint">Bienvenue</p>
+              <h4 class="mt-3 font-display text-[2rem] leading-[0.95] tracking-[-0.03em]">Organisez un voyage entier dans une seule interface.</h4>
+              <p class="mt-4 text-sm leading-6 text-muted dark:text-darkmuted">Itinéraire, budget, documents et carte réunis dans un espace élégant, prêt pour le mobile et agréable sur desktop.</p>
+              <div class="mt-5 flex flex-wrap gap-3">
+                <button class="rounded-2xl bg-accent px-4 py-3 text-sm font-medium text-white dark:bg-darkaccent dark:text-slate-950">Nouveau voyage</button>
+                <button class="rounded-2xl border border-borderc bg-white px-4 py-3 text-sm font-medium dark:border-darkborder dark:bg-darksurface2">Importer un JSON</button>
+              </div>
+            </div>
+            <div class="mt-6 grid gap-3 sm:grid-cols-3">
+              <div class="rounded-[22px] bg-white/80 p-4 backdrop-blur dark:bg-white/5">
+                <p class="text-sm font-medium">Plan</p>
+                <p class="mt-1 text-xs text-muted dark:text-darkmuted">Jour par jour, étapes et notes</p>
+              </div>
+              <div class="rounded-[22px] bg-white/80 p-4 backdrop-blur dark:bg-white/5">
+                <p class="text-sm font-medium">Documents</p>
+                <p class="mt-1 text-xs text-muted dark:text-darkmuted">Billets, assurance, réservations</p>
+              </div>
+              <div class="rounded-[22px] bg-white/80 p-4 backdrop-blur dark:bg-white/5">
+                <p class="text-sm font-medium">Budget</p>
+                <p class="mt-1 text-xs text-muted dark:text-darkmuted">Dépenses, participants, remboursements</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-[30px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface lg:p-5">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">Mode lecture</p>
+              <h3 class="mt-1 text-lg font-semibold">Variante apaisée</h3>
+            </div>
+            <span class="rounded-full bg-accentsoft px-3 py-1.5 text-xs font-medium text-accent dark:bg-darksurface2 dark:text-darkaccent">Lecture</span>
+          </div>
+          <div class="mt-4 rounded-[28px] border border-borderc bg-[linear-gradient(180deg,#fefdfb,#f7f3ee)] p-5 dark:border-darkborder dark:bg-[linear-gradient(180deg,#1b1916,#151310)]">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">JOUR 07</p>
+                <h4 class="mt-2 font-display text-[1.8rem] leading-none">Kyoto — Est</h4>
+              </div>
+              <button class="rounded-full border border-borderc px-3 py-1.5 text-xs text-muted dark:border-darkborder dark:text-darkmuted">Mode lecture actif</button>
+            </div>
+            <div class="mt-5 space-y-3">
+              <div class="rounded-[24px] bg-white p-4 shadow-sm dark:bg-darksurface2">
+                <p class="text-xs text-muted dark:text-darkmuted">09:00</p>
+                <p class="mt-1 text-base font-semibold">Promenade au chemin de la philosophie</p>
+                <p class="mt-1 text-sm text-muted dark:text-darkmuted">Moins d'actions visibles, lecture plus fluide, hiérarchie renforcée.</p>
+              </div>
+              <div class="rounded-[24px] bg-white p-4 shadow-sm dark:bg-darksurface2">
+                <p class="text-xs text-muted dark:text-darkmuted">13:30</p>
+                <p class="mt-1 text-base font-semibold">Déjeuner près de Gion</p>
+                <p class="mt-1 text-sm text-muted dark:text-darkmuted">Les boutons d'édition sont masqués au profit d'une consultation calme.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-6 grid gap-4 xl:grid-cols-2">
+        <div class="rounded-[30px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface lg:p-5">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">Modale étape</p>
+              <h3 class="mt-1 text-lg font-semibold">Ajouter / modifier l'étape</h3>
+            </div>
+            <span class="rounded-full bg-surface2 px-3 py-1.5 text-xs text-muted dark:bg-darksurface2 dark:text-darkmuted">Sheet</span>
+          </div>
+          <div class="mt-4 rounded-[30px] border border-borderc bg-white p-5 shadow-sm dark:border-darkborder dark:bg-darksurface2">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h4 class="text-base font-semibold">Ajouter une étape</h4>
+                <p class="mt-1 text-sm text-muted dark:text-darkmuted">Ajout rapide, autocomplétion du lieu, lien et budget lié.</p>
+              </div>
+              <button class="rounded-xl p-2 text-muted dark:text-darkmuted">✕</button>
+            </div>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+              <div>
+                <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Heure</label>
+                <div class="rounded-2xl border border-borderc px-3 py-3 text-sm dark:border-darkborder">10:45</div>
+              </div>
+              <div>
+                <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Transport</label>
+                <div class="rounded-2xl border border-borderc px-3 py-3 text-sm dark:border-darkborder">Train</div>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Titre</label>
+                <div class="rounded-2xl border border-borderc px-3 py-3 text-sm dark:border-darkborder">Visite du Fushimi Inari</div>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Lieu</label>
+                <div class="rounded-2xl border border-accent/30 bg-accentsoft/40 px-3 py-3 text-sm dark:border-darkaccent/30 dark:bg-darkbg">Fushimi Inari Taisha, Kyoto</div>
+                <p class="mt-1 text-xs text-muted dark:text-darkmuted">Suggestion instantanée, sélection rapide et fiable.</p>
+              </div>
+              <div>
+                <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Prix</label>
+                <div class="rounded-2xl border border-borderc px-3 py-3 text-sm dark:border-darkborder">18 €</div>
+              </div>
+              <div>
+                <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Qui a payé ?</label>
+                <div class="rounded-2xl border border-borderc px-3 py-3 text-sm dark:border-darkborder">Emma</div>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Note</label>
+                <div class="rounded-2xl border border-borderc px-3 py-3 text-sm text-muted dark:border-darkborder dark:text-darkmuted">Monter tôt pour éviter la foule et garder 2h sur place.</div>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between rounded-2xl bg-surface2 px-4 py-3 dark:bg-darkbg">
+              <div>
+                <p class="text-sm font-medium">Ajouter cette dépense au Budget</p>
+                <p class="text-xs text-muted dark:text-darkmuted">Si un prix est saisi, la dépense sera ajoutée automatiquement.</p>
+              </div>
+              <div class="h-7 w-12 rounded-full bg-accent p-1 dark:bg-darkaccent"><div class="ml-auto h-5 w-5 rounded-full bg-white dark:bg-slate-950"></div></div>
+            </div>
+            <div class="mt-4 flex gap-2">
+              <button class="flex-1 rounded-2xl border border-borderc px-4 py-3 text-sm font-medium dark:border-darkborder">Annuler</button>
+              <button class="flex-1 rounded-2xl bg-accent px-4 py-3 text-sm font-medium text-white dark:bg-darkaccent dark:text-slate-950">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="rounded-[30px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface lg:p-5">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">Modale voyage</p>
+                <h3 class="mt-1 text-lg font-semibold">Modifier les dates</h3>
+              </div>
+              <span class="rounded-full bg-surface2 px-3 py-1.5 text-xs text-muted dark:bg-darksurface2 dark:text-darkmuted">Dialog</span>
+            </div>
+            <div class="mt-4 rounded-[28px] border border-borderc bg-white p-5 shadow-sm dark:border-darkborder dark:bg-darksurface2">
+              <div class="grid gap-3 sm:grid-cols-3">
+                <div>
+                  <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Date de début</label>
+                  <div class="rounded-2xl border border-borderc px-3 py-3 text-sm dark:border-darkborder">12/04/2027</div>
+                </div>
+                <div>
+                  <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Nombre de jours</label>
+                  <div class="rounded-2xl border border-accent/30 bg-accentsoft/40 px-3 py-3 text-sm dark:border-darkaccent/30 dark:bg-darkbg">21</div>
+                </div>
+                <div>
+                  <label class="mb-1.5 block text-xs font-medium text-muted dark:text-darkmuted">Date de fin</label>
+                  <div class="rounded-2xl border border-borderc px-3 py-3 text-sm dark:border-darkborder">02/05/2027</div>
+                </div>
+              </div>
+              <p class="mt-3 text-xs leading-5 text-muted dark:text-darkmuted">Si vous modifiez le nombre de jours, la date de fin est recalculée automatiquement. Si vous modifiez la date de fin, le nombre de jours s'ajuste.</p>
+              <div class="mt-4 flex gap-2">
+                <button class="flex-1 rounded-2xl border border-borderc px-4 py-3 text-sm font-medium dark:border-darkborder">Fermer</button>
+                <button class="flex-1 rounded-2xl bg-accent px-4 py-3 text-sm font-medium text-white dark:bg-darkaccent dark:text-slate-950">Mettre à jour</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-[30px] border border-borderc bg-surface p-4 shadow-soft dark:border-darkborder dark:bg-darksurface lg:p-5">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-xs uppercase tracking-[0.18em] text-faint dark:text-darkfaint">Actions sensibles</p>
+                <h3 class="mt-1 text-lg font-semibold">Suppression & import</h3>
+              </div>
+            </div>
+            <div class="mt-4 grid gap-3 md:grid-cols-2">
+              <div class="rounded-[26px] border border-rose-200 bg-rose-50 p-5 dark:border-rose-900/40 dark:bg-rose-950/20">
+                <p class="text-sm font-semibold text-rose-800 dark:text-rose-300">Supprimer ce voyage ?</p>
+                <p class="mt-2 text-xs leading-5 text-rose-700 dark:text-rose-300/80">Cette action est irréversible. Toutes les étapes, dépenses et documents associés seront supprimés.</p>
+                <div class="mt-4 flex gap-2">
+                  <button class="flex-1 rounded-2xl border border-rose-200 px-4 py-3 text-sm font-medium text-rose-800 dark:border-rose-900/40 dark:text-rose-300">Annuler</button>
+                  <button class="flex-1 rounded-2xl bg-rose-700 px-4 py-3 text-sm font-medium text-white">Supprimer</button>
+                </div>
+              </div>
+              <div class="rounded-[26px] border border-borderc bg-white p-5 dark:border-darkborder dark:bg-darksurface2">
+                <p class="text-sm font-semibold">Importer un JSON</p>
+                <p class="mt-2 text-xs leading-5 text-muted dark:text-darkmuted">Glissez un fichier ici ou sélectionnez-le pour restaurer un voyage existant.</p>
+                <div class="mt-4 rounded-[22px] border border-dashed border-borderc px-4 py-8 text-center dark:border-darkborder">
+                  <p class="text-sm font-medium">Déposer le fichier JSON</p>
+                  <p class="mt-1 text-xs text-muted dark:text-darkmuted">Import sécurisé, aperçu avant validation.</p>
+                </div>
+                <button class="mt-4 w-full rounded-2xl bg-accent px-4 py-3 text-sm font-medium text-white dark:bg-darkaccent dark:text-slate-950">Choisir un fichier</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const root = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    toggle?.addEventListener('click', () => {
+      const dark = root.getAttribute('data-theme') === 'dark';
+      root.setAttribute('data-theme', dark ? 'light' : 'dark');
+    });
+  </script>
+</body>
+</html>
