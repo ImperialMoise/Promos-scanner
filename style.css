@@ -15,22 +15,34 @@
   font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
 }
 
-body {
-  margin: 0;
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.deal-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.deal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 4px 4px 0 rgba(93, 92, 116, 0.2);
+}
+
+.category-card {
+  transition: transform 0.2s ease;
+}
+
+.category-card:hover {
+  transform: scale(1.02);
 }
 
 button,
 a,
 input {
   font: inherit;
-}
-
-.deal-image {
-  background-size: cover;
-  background-position: center;
-}
-
-.card-hover:hover {
-  box-shadow: 4px 4px 0 rgba(93, 92, 116, 0.15);
-  transform: translateY(-4px);
 }

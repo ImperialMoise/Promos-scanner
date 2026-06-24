@@ -1,234 +1,310 @@
 const deals = [
   {
-    title: "Menu Étudiant",
-    price: "5€",
-    brand: "Burger King",
-    brandInitials: "BK",
-    brandColor: "bg-error-container text-on-error-container",
+    id: 1,
+    title: "Mardi Fou",
+    brand: "Domino's Pizza",
+    badge: "Flash",
+    badgeIcon: "schedule",
+    badgeClass: "bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary-fixed-dim",
+    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80",
+    oldPrice: "24.90€",
+    price: "7.99€",
+    distance: "1.2 km",
+    category: "flash",
+    city: "Bordeaux",
+  },
+  {
+    id: 2,
+    title: "Student Box",
+    brand: "KFC",
     badge: "Étudiant",
     badgeIcon: "school",
-    badgeClass: "bg-secondary text-on-secondary",
-    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80",
-    timeIcon: "timer",
-    timeText: "Expire ce soir",
-    timeClass: "text-error",
-    action: "Profiter",
-    primaryAction: true,
+    badgeClass: "bg-secondary text-on-secondary border border-secondary-fixed-dim",
+    image: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?auto=format&fit=crop&w=900&q=80",
+    price: "-50%",
+    distance: "0.8 km",
+    category: "student",
+    city: "Bordeaux",
   },
   {
-    title: "Offre Ciné + Burger",
-    price: "12€",
-    oldPrice: "18€",
-    brand: "UGC + FastFood Local",
-    brandIcon: "movie",
-    badge: "Combo",
-    badgeIcon: "local_activity",
-    badgeClass: "bg-tertiary-container text-on-tertiary-container",
-    image: "https://images.unsplash.com/photo-1627225924765-552d49cf47ad?auto=format&fit=crop&w=900&q=80",
-    timeIcon: "calendar_today",
-    timeText: "Valable 7j",
-    timeClass: "text-on-surface-variant",
-    action: "Détails",
-    primaryAction: false,
-  },
-  {
-    title: "Mardi Fou Dominos",
-    price: "1+1",
-    brand: "Dominos Pizza",
-    brandInitials: "DP",
-    brandColor: "bg-secondary text-on-secondary",
-    badge: "Flash Deal",
-    badgeIcon: "local_fire_department",
+    id: 3,
+    title: "King Deal",
+    brand: "Burger King",
+    badge: "Soir",
+    badgeIcon: "dark_mode",
     badgeClass: "bg-primary-container text-on-primary-container border border-primary",
-    image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=900&q=80",
-    code: "MARDI50",
-    action: "Copier & Commander",
-    primaryAction: true,
-    wideOnTablet: true,
+    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80",
+    oldPrice: "12.90€",
+    price: "8.90€",
+    distance: "1.6 km",
+    category: "night",
+    city: "Bordeaux",
+  },
+  {
+    id: 4,
+    title: "Nouveau Wrap",
+    brand: "FastFood Local",
+    badge: "Nouveau",
+    badgeIcon: "auto_awesome",
+    badgeClass: "bg-tertiary text-on-tertiary border border-tertiary",
+    image: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=900&q=80",
+    price: "6.50€",
+    distance: "2.1 km",
+    category: "new",
+    city: "Bordeaux",
   },
 ];
 
-const filters = [
-  { label: "Dominos", icon: "local_pizza" },
-  { label: "KFC", icon: "restaurant" },
-  { label: "Étudiant", icon: "school", active: true },
-  { label: "Mardi Fou", icon: "schedule" },
-  { label: "Price Range", icon: "payments" },
+const categories = [
+  {
+    id: "student",
+    eyebrow: "Populaire",
+    title: "Meilleures Offres Étudiantes",
+    badgeClass: "bg-secondary text-on-secondary",
+    image: "https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: "night",
+    eyebrow: "Dès 20h",
+    title: "Deals du Soir",
+    badgeClass: "bg-primary-container text-on-primary-container",
+    image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: "new",
+    eyebrow: "À Découvrir",
+    title: "Nouveautés",
+    badgeClass: "bg-tertiary text-on-tertiary",
+    image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=80",
+  },
 ];
 
-function Icon({ name, className = "" }) {
-  return <span className={`material-symbols-outlined ${className}`}>{name}</span>;
+function Icon({ name, className = "", fill = true }) {
+  const style = { fontVariationSettings: `'FILL' ${fill ? 1 : 0}, 'wght' 400, 'GRAD' 0, 'opsz' 24` };
+  return <span className={`material-symbols-outlined ${className}`} style={style}>{name}</span>;
 }
 
 function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-surface-variant bg-surface">
       <nav className="mx-auto flex w-full max-w-container-max items-center justify-between px-md py-sm">
-        <a className="flex items-center gap-2" href="#top" aria-label="Accueil FastOffres">
-          <Icon name="local_fire_department" className="text-3xl text-primary" />
-          <span className="hidden font-display text-display-lg font-black text-primary md:block">FastOffres</span>
-          <span className="block font-display text-display-lg-mobile font-black text-primary md:hidden">FastOffres</span>
+        <a className="font-display-lg text-display-lg-mobile font-black text-primary md:text-display-lg" href="#top">
+          FastOffres
         </a>
 
-        <div className="relative mx-md hidden max-w-md flex-1 md:flex">
-          <Icon name="location_on" className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary" />
-          <input
-            className="w-full rounded-full border-2 border-secondary bg-surface-container-lowest py-2 pl-10 pr-4 text-body-md text-on-surface transition-colors focus:border-primary focus:outline-none"
-            placeholder="Bordeaux..."
-            type="text"
-          />
-        </div>
+        <ul className="hidden items-center gap-lg md:flex">
+          <li>
+            <a className="border-b-2 border-primary pb-1 font-label-bold text-label-bold text-primary transition-colors hover:text-primary" href="#deals">
+              Offres du Jour
+            </a>
+          </li>
+          <li>
+            <a className="font-label-bold text-label-bold text-on-surface-variant transition-colors duration-100 hover:text-primary" href="#categories">
+              Par Enseignes
+            </a>
+          </li>
+        </ul>
 
-        <div className="flex items-center gap-md">
-          <a className="flex scale-95 items-center gap-1 border-b-2 border-primary pb-1 text-label-bold font-bold text-primary transition-colors" href="#deals">
-            Offres du Jour
-          </a>
-          <a className="hidden scale-95 items-center gap-1 text-label-bold font-bold text-on-surface-variant transition-colors hover:text-primary md:flex" href="#brands">
-            Par Enseignes
-          </a>
-          <button className="ml-sm rounded-full bg-primary-container px-4 py-2 text-label-bold font-bold text-on-primary-container transition-colors hover:bg-primary hover:text-on-primary">
-            Mon Profil
-          </button>
-        </div>
+        <button className="flex items-center justify-center rounded-full p-sm font-label-bold text-label-bold text-primary transition-colors duration-100 hover:bg-surface-container" type="button">
+          <Icon name="person" fill={false} />
+          <span className="ml-xs hidden md:inline">Mon Profil</span>
+        </button>
       </nav>
     </header>
   );
 }
 
-function Sidebar() {
+function Hero({ city, setCity, onSearch }) {
   return (
-    <aside className="sticky top-[80px] hidden h-[calc(100vh-80px)] w-64 flex-col gap-base rounded-r-xl border-r border-surface-variant bg-surface-container-low p-md shadow-sm lg:flex">
-      <div className="mb-sm">
-        <h2 className="text-headline-sm font-bold text-on-surface">Filtres</h2>
-        <p className="mt-1 text-body-md text-on-surface-variant">Affinez vos recherches</p>
-      </div>
+    <section className="relative flex flex-col items-center gap-md overflow-hidden rounded-xl border border-surface-variant bg-surface-container-low px-md py-lg text-center">
+      <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary-container opacity-20 blur-3xl" />
+      <h1 className="z-10 max-w-2xl font-display-lg text-display-lg-mobile text-on-surface md:text-display-lg">
+        Trouvez les meilleures offres fast-food à
+      </h1>
 
-      <nav className="flex flex-col gap-xs" aria-label="Filtres par enseigne et type d'offre">
-        {filters.map((filter) => (
-          <button
-            className={`flex w-full items-center gap-3 rounded-lg p-3 text-left text-label-bold font-bold transition-all duration-200 ${
-              filter.active
-                ? "bg-secondary-container text-on-secondary-container"
-                : "text-on-surface-variant hover:bg-surface-variant"
-            }`}
-            type="button"
-            key={filter.label}
-          >
-            <Icon name={filter.icon} className="text-[20px]" />
-            {filter.label}
+      <form className="z-10 mt-sm w-full max-w-xl" onSubmit={onSearch}>
+        <div className="flex items-center overflow-hidden rounded-lg border-2 border-secondary bg-surface-container-lowest shadow-sm transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary">
+          <div className="flex items-center justify-center py-sm pl-md pr-sm text-secondary">
+            <Icon name="location_on" />
+          </div>
+          <input
+            className="w-full border-none bg-transparent px-xs py-sm font-headline-sm text-headline-sm text-on-surface placeholder-on-surface-variant focus:ring-0"
+            placeholder="Votre ville..."
+            type="text"
+            value={city}
+            onChange={(event) => setCity(event.target.value)}
+          />
+          <button className="h-full bg-primary px-md py-sm font-label-bold text-label-bold text-on-primary transition-colors hover:bg-surface-tint md:px-lg" type="submit">
+            Rechercher
           </button>
-        ))}
-      </nav>
-    </aside>
+        </div>
+      </form>
+    </section>
   );
 }
 
-function BrandLine({ deal }) {
+function DealCard({ deal, onSelect }) {
   return (
-    <div className="mb-4 flex items-center gap-2 text-on-surface-variant">
-      {deal.brandInitials ? (
-        <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${deal.brandColor}`}>
-          {deal.brandInitials}
-        </div>
-      ) : (
-        <Icon name={deal.brandIcon} className="text-secondary" />
-      )}
-      <span className="text-label-bold font-bold">{deal.brand}</span>
-      {deal.brandInitials && <Icon name="verified" className="text-sm text-tertiary-container" />}
-    </div>
-  );
-}
-
-function DealCard({ deal }) {
-  return (
-    <article className={`card-hover group relative flex flex-col overflow-hidden rounded-xl border border-surface-variant bg-surface-container-lowest transition-all duration-300 ${deal.wideOnTablet ? "sm:col-span-2 xl:col-span-1" : ""}`}>
-      <div className="relative aspect-video w-full overflow-hidden bg-surface-variant">
-        <div className="deal-image h-full w-full transition-transform duration-500 group-hover:scale-105" style={{ backgroundImage: `url('${deal.image}')` }} />
-        <div className={`absolute left-sm top-sm flex items-center gap-1 rounded-full px-3 py-1 shadow-sm ${deal.badgeClass}`}>
-          <Icon name={deal.badgeIcon} className="text-[16px]" />
-          <span className="text-label-sm font-bold uppercase tracking-wider">{deal.badge}</span>
-        </div>
+    <article className="deal-card relative flex min-w-[280px] flex-shrink-0 flex-col overflow-hidden rounded-xl border border-surface-variant bg-surface-container-lowest md:min-w-[320px]">
+      <div className={`absolute left-sm top-sm z-10 flex items-center gap-xs rounded-full px-sm py-xs font-label-bold text-label-bold shadow-sm ${deal.badgeClass}`}>
+        <Icon name={deal.badgeIcon} className="text-[16px]" />
+        {deal.badge}
       </div>
 
-      <div className="flex flex-1 flex-col p-md">
-        <div className="mb-2 flex items-start justify-between">
-          <h3 className="text-headline-md font-bold leading-tight text-on-surface">{deal.title}</h3>
-          <div className="ml-2 flex shrink-0 flex-col items-end">
-            <span className="font-display text-display-lg-mobile font-black leading-none text-primary">{deal.price}</span>
-            {deal.oldPrice && <span className="text-sm text-on-surface-variant line-through">{deal.oldPrice}</span>}
+      <div className="relative h-40 w-full bg-surface-variant">
+        <img className="absolute inset-0 h-full w-full object-cover" src={deal.image} alt={`${deal.title} chez ${deal.brand}`} />
+      </div>
+
+      <div className="flex flex-grow flex-col gap-sm p-md">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="font-headline-sm text-headline-sm text-on-surface">{deal.title}</h3>
+            <div className="mt-xs flex items-center gap-xs text-on-surface-variant">
+              <span className="font-label-bold text-label-bold">{deal.brand}</span>
+              <Icon name="verified" className="text-[16px] text-primary-container" />
+            </div>
+          </div>
+
+          <div className="rounded bg-surface-container px-sm py-xs text-center">
+            {deal.oldPrice && <span className="block font-label-sm text-label-sm text-on-surface-variant line-through">{deal.oldPrice}</span>}
+            <span className="block font-headline-sm text-headline-sm text-primary">{deal.price}</span>
           </div>
         </div>
 
-        <BrandLine deal={deal} />
-
-        {deal.code ? (
-          <div className="mt-auto flex flex-col gap-3 border-t border-surface-variant pt-4">
-            <div className="flex items-center justify-between rounded-md bg-surface-container-high p-2">
-              <span className="text-sm font-bold text-on-surface-variant">Code Promo:</span>
-              <span className="font-mono font-bold tracking-widest text-primary">{deal.code}</span>
-            </div>
-            <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-label-bold font-bold text-on-primary transition-colors hover:bg-on-primary-fixed hover:text-primary-fixed">
-              <Icon name="content_copy" />
-              {deal.action}
-            </button>
-          </div>
-        ) : (
-          <div className="mt-auto flex items-center justify-between border-t border-surface-variant pt-4">
-            <div className={`flex items-center gap-1 text-label-sm font-bold ${deal.timeClass}`}>
-              <Icon name={deal.timeIcon} className="text-[18px]" />
-              {deal.timeText}
-            </div>
-            <button className={deal.primaryAction ? "rounded-lg bg-primary px-4 py-2 text-label-bold font-bold text-on-primary transition-colors hover:bg-on-primary-fixed hover:text-primary-fixed" : "rounded-lg border-2 border-primary px-4 py-1.5 text-label-bold font-bold text-primary transition-colors hover:bg-primary-fixed hover:text-on-primary-fixed"}>
-              {deal.action}
-            </button>
-          </div>
-        )}
+        <div className="mt-auto flex items-center justify-between border-t border-surface-variant pt-sm">
+          <span className="flex items-center gap-xs font-label-sm text-label-sm text-secondary">
+            <Icon name="location_on" className="text-[14px]" fill={false} />
+            {deal.distance}
+          </span>
+          <button className="rounded bg-primary px-sm py-xs font-label-bold text-label-bold text-on-primary transition-colors hover:bg-surface-tint" type="button" onClick={() => onSelect(deal)}>
+            Profiter
+          </button>
+        </div>
       </div>
     </article>
   );
 }
 
-function App() {
+function DealsSection({ dealsToShow, onSelect, onReset }) {
   return (
-    <div id="top" className="flex min-h-screen flex-col bg-surface text-on-surface">
-      <Header />
-
-      <div className="mx-auto flex w-full max-w-container-max flex-1">
-        <Sidebar />
-
-        <main className="flex-1 p-gutter md:p-md lg:pl-lg" id="deals">
-          <div className="mb-md flex items-end justify-between">
-            <div>
-              <h1 className="font-display text-display-lg-mobile font-black uppercase leading-none tracking-tight text-on-surface md:text-display-lg">
-                Bordeaux <span className="block text-primary-container md:inline">Hot Deals</span>
-              </h1>
-              <p className="mt-2 max-w-2xl text-body-lg text-on-surface-variant">
-                Les meilleures réductions rapides autour de vous. Vite, ça part vite !
-              </p>
-            </div>
-            <button className="flex items-center justify-center rounded-full bg-surface-variant p-2 text-on-surface lg:hidden" type="button" aria-label="Ouvrir les filtres">
-              <Icon name="tune" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 gap-md sm:grid-cols-2 lg:gap-lg xl:grid-cols-3">
-            {deals.map((deal) => (
-              <DealCard deal={deal} key={deal.title} />
-            ))}
-          </div>
-        </main>
+    <section className="flex flex-col gap-md" id="deals">
+      <div className="flex items-end justify-between">
+        <div>
+          <h2 className="flex items-center gap-sm font-headline-md text-headline-md text-on-surface">
+            <Icon name="local_fire_department" className="text-primary-container" />
+            Offres Flash du Jour
+          </h2>
+          <p className="mt-xs font-body-md text-body-md text-on-surface-variant">Ces deals disparaissent bientôt !</p>
+        </div>
+        <button className="hidden items-center gap-xs font-label-bold text-label-bold text-secondary transition-colors hover:text-primary md:flex" type="button" onClick={onReset}>
+          Voir tout <Icon name="arrow_forward" className="text-sm" fill={false} />
+        </button>
       </div>
 
-      <footer className="mt-xl flex w-full flex-col items-center gap-md border-t-4 border-primary bg-on-secondary-fixed px-md py-lg">
-        <div className="text-headline-md font-black text-primary-container">FastOffres</div>
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
-          <a className="text-label-sm text-surface-variant opacity-80 transition-colors hover:text-primary-container hover:opacity-100" href="#top">Villes</a>
-          <a className="text-label-sm text-surface-variant opacity-80 transition-colors hover:text-primary-container hover:opacity-100" href="#top">Mentions Légales</a>
-          <a className="text-label-sm text-surface-variant opacity-80 transition-colors hover:text-primary-container hover:opacity-100" href="#top">Confidentialité</a>
-          <a className="text-label-sm text-surface-variant opacity-80 transition-colors hover:text-primary-container hover:opacity-100" href="#top">Aide</a>
+      <div className="hide-scrollbar -mx-gutter flex gap-md overflow-x-auto px-gutter pb-sm md:mx-0 md:px-0">
+        {dealsToShow.map((deal) => (
+          <DealCard deal={deal} key={deal.id} onSelect={onSelect} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CategoryCard({ category, onPick }) {
+  return (
+    <button className="category-card group relative flex h-48 items-end overflow-hidden rounded-xl border border-surface-variant bg-surface-container-low p-md text-left md:h-64" type="button" onClick={() => onPick(category.id)}>
+      <div className="absolute inset-0 z-0">
+        <img className="h-full w-full object-cover opacity-80 transition-opacity group-hover:opacity-100" src={category.image} alt={category.title} />
+        <div className="absolute inset-0 bg-gradient-to-t from-on-surface via-transparent to-transparent opacity-80" />
+      </div>
+      <div className="relative z-10 flex flex-col gap-xs">
+        <span className={`w-fit rounded px-xs py-[2px] font-label-sm text-label-sm uppercase tracking-wider ${category.badgeClass}`}>
+          {category.eyebrow}
+        </span>
+        <h3 className="font-headline-md text-headline-md text-on-primary">{category.title}</h3>
+      </div>
+    </button>
+  );
+}
+
+function CategoriesSection({ onPick }) {
+  return (
+    <section className="grid grid-cols-1 gap-md md:grid-cols-3" id="categories">
+      {categories.map((category) => (
+        <CategoryCard category={category} key={category.id} onPick={onPick} />
+      ))}
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="mt-auto flex w-full flex-col items-center gap-md bg-on-secondary-fixed px-md py-lg text-primary-fixed">
+      <div className="font-headline-md text-headline-md font-black text-primary-container">FastOffres</div>
+      <ul className="flex flex-wrap justify-center gap-md">
+        {['Villes', 'Mentions Légales', 'Confidentialité', 'Aide'].map((link) => (
+          <li key={link}>
+            <a className="font-label-sm text-label-sm text-surface-variant opacity-80 transition-colors hover:text-primary-container hover:opacity-100" href="#top">
+              {link}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-sm text-center font-body-md text-body-md text-surface-dim">© 2026 FastOffres. Tous droits réservés.</div>
+    </footer>
+  );
+}
+
+function App() {
+  const [city, setCity] = React.useState("Bordeaux");
+  const [searchedCity, setSearchedCity] = React.useState("Bordeaux");
+  const [category, setCategory] = React.useState("all");
+  const [message, setMessage] = React.useState("");
+
+  const filteredDeals = deals.filter((deal) => category === "all" || deal.category === category);
+
+  function handleSearch(event) {
+    event.preventDefault();
+    const nextCity = city.trim() || "Bordeaux";
+    setCity(nextCity);
+    setSearchedCity(nextCity);
+    setMessage(`Recherche lancée pour ${nextCity}. Les offres affichées restent des exemples pour le MVP.`);
+  }
+
+  function handlePickCategory(nextCategory) {
+    setCategory(nextCategory);
+    setMessage("Catégorie filtrée. Clique sur “Voir tout” pour revenir aux offres flash.");
+  }
+
+  function handleReset() {
+    setCategory("all");
+    setMessage("Toutes les offres flash sont à nouveau affichées.");
+  }
+
+  function handleSelectDeal(deal) {
+    setMessage(`Tu as sélectionné “${deal.title}” chez ${deal.brand}. Prochaine étape : ouvrir la vraie page de l'offre.`);
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col" id="top">
+      <Header />
+      <main className="mx-auto flex w-full max-w-container-max flex-grow flex-col gap-lg px-gutter py-lg md:px-md">
+        <Hero city={city} setCity={setCity} onSearch={handleSearch} />
+
+        {message && (
+          <div className="rounded-lg border border-primary-fixed bg-primary-fixed px-md py-sm font-label-bold text-label-bold text-on-primary-fixed-variant" role="status">
+            {message}
+          </div>
+        )}
+
+        <div className="font-label-bold text-label-bold text-on-surface-variant">
+          Ville active : <span className="text-primary">{searchedCity}</span>
         </div>
-        <p className="mt-4 text-center text-body-md text-surface-variant">© 2026 FastOffres. Tous droits réservés.</p>
-      </footer>
+
+        <DealsSection dealsToShow={filteredDeals} onSelect={handleSelectDeal} onReset={handleReset} />
+        <CategoriesSection onPick={handlePickCategory} />
+      </main>
+      <Footer />
     </div>
   );
 }
