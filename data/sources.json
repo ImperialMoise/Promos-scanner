@@ -1,11 +1,21 @@
 [
   {
+    "id": "mcdonalds-france-offres",
+    "brand": "McDonald's",
+    "city": "Bordeaux",
+    "url": "https://www.mcdonalds.fr/",
+    "type": "official_site",
+    "priority": 1,
+    "enabled": true,
+    "keywords": ["offre", "menu", "promo", "app", "fidélité", "monopoly", "€"]
+  },
+  {
     "id": "dominos-jours-fous",
     "brand": "Domino's Pizza",
     "city": "Bordeaux",
     "url": "https://www.dominos.fr/dominos-pizza/mardis-jeudis-fous",
     "type": "official_offer_page",
-    "priority": 1,
+    "priority": 2,
     "enabled": true,
     "keywords": ["mardi", "jeudi", "fou", "pizza", "offre", "€"]
   },

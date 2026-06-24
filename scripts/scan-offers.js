@@ -54,7 +54,7 @@ function scoreSentence(sentence, source) {
   }
 
   if (/\d+[,.]?\d*\s?(€|euros?)/i.test(sentence)) score += 3;
-  if (/(offre|promo|deal|menu|réduction|reduction|gratuit|mardi|jeudi)/i.test(sentence)) score += 2;
+  if (/(offre|promo|deal|menu|réduction|reduction|gratuit|mardi|jeudi|étudiant|student|coupon|code|fidélité|app|livraison|formule)/i.test(sentence)) score += 2;
   if (lower.includes(source.brand.toLowerCase().split(" ")[0])) score += 1;
 
   return score;
@@ -108,7 +108,7 @@ async function scanSource(source) {
     .map((sentence) => ({ sentence, score: scoreSentence(sentence, source) }))
     .filter((item) => item.score >= 4)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 3)
+    .slice(0, 5)
     .map((item) => buildOfferCandidate(item.sentence, source));
 
   return candidates;

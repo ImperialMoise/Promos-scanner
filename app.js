@@ -84,8 +84,8 @@ function normalizeOffer(offer) {
     id: offer.id,
     title: offer.title,
     brand: offer.brand,
-    badge: offer.badge || "Vérifiée",
-    badgeIcon: offer.badge_icon || "verified",
+    badge: offer.badge || (offer.confidence_score >= 80 ? "Vérifiée" : "À vérifier"),
+    badgeIcon: offer.badge_icon || (offer.confidence_score >= 80 ? "verified" : "visibility"),
     badgeClass: badgeClassForCategory(offer.category),
     image: offer.image || imageForCategory(offer.category),
     oldPrice: offer.old_price,
@@ -94,6 +94,7 @@ function normalizeOffer(offer) {
     category: offer.category || "new",
     city: offer.city || "Bordeaux",
     sourceUrl: offer.source_url,
+    description: offer.description,
     confidenceScore: offer.confidence_score,
   };
 }
@@ -204,7 +205,13 @@ function DealCard({ deal, onSelect }) {
           </div>
         </div>
 
-        <div className="mt-auto flex items-center justify-between border-t border-surface-variant pt-sm">
+        {deal.sourceUrl && (
+  <p className="font-label-sm text-label-sm text-on-surface-variant">
+    Source officielle disponible
+  </p>
+)}
+
+<div className="mt-auto flex items-center justify-between border-t border-surface-variant pt-sm">
           <span className="flex items-center gap-xs font-label-sm text-label-sm text-secondary">
             <Icon name="location_on" className="text-[14px]" fill={false} />
             {deal.distance}
@@ -302,7 +309,7 @@ function App() {
 
     if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase) {
       setDataMode("demo");
-      setMessage("Mode démo : ajoute tes clés Supabase dans index.html pour afficher les offres publiées de la base.");
+      setMessage("Mode démo : les offres affichées sont des exemples. Ajoute tes clés Supabase dans index.html pour afficher uniquement les vraies offres validées.");
       return;
     }
 
@@ -311,7 +318,7 @@ function App() {
 
     client
       .from("offers")
-      .select("id, title, brand, badge, badge_icon, category, city, image, old_price, price, distance, source_url, confidence_score, last_seen_at")
+      .select("id, title, description, brand, badge, badge_icon, category, city, image, old_price, price, distance, source_url, confidence_score, last_seen_at")
       .eq("status", "published")
       .order("last_seen_at", { ascending: false })
       .limit(20)
@@ -325,7 +332,7 @@ function App() {
         } else {
           setDeals(fallbackDeals);
           setDataMode("empty");
-          setMessage("Supabase est connecté, mais aucune offre publiée pour l'instant. Les cartes de démo restent affichées.");
+          setMessage("Aucune offre vérifiée pour l’instant");
         }
       })
       .catch((error) => {
@@ -343,7 +350,7 @@ function App() {
     const nextCity = city.trim() || "Bordeaux";
     setCity(nextCity);
     setSearchedCity(nextCity);
-    setMessage(`Recherche lancée pour ${nextCity}. Les offres affichées restent des exemples pour le MVP.`);
+    setMessage(`Recherche lancée pour ${nextCity}. Pour l'instant, seules les offres validées dans Supabase peuvent réellement changer.`);
   }
 
   function handlePickCategory(nextCategory) {
@@ -356,9 +363,15 @@ function App() {
     setMessage("Toutes les offres flash sont à nouveau affichées.");
   }
 
-  function handleSelectDeal(deal) {
-    setMessage(`Tu as sélectionné “${deal.title}” chez ${deal.brand}. Prochaine étape : ouvrir la vraie page de l'offre.`);
+function handleSelectDeal(deal) {
+  if (deal.sourceUrl) {
+    window.open(deal.sourceUrl, "_blank", "noopener,noreferrer");
+    setMessage(`Ouverture de la source officielle pour “${deal.title}” chez ${deal.brand}.`);
+    return;
   }
+
+  setMessage(`Cette offre est un exemple de démo : aucune source officielle n'est liée pour l'instant.`);
+}
 
   return (
     <div className="flex min-h-screen flex-col" id="top">
