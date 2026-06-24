@@ -3,7 +3,7 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const SCAN_SECRET = process.env.SCAN_SECRET;
 
 const USER_AGENT = "FastOffresBot/0.1 (+https://fastoffres.fr; Vercel scanner)";
-const MAX_SOURCES_PER_RUN = 8;
+const MAX_SOURCES_PER_RUN = 10;
 const FETCH_TIMEOUT_MS = 8000;
 
 async function fetchWithTimeout(url, options = {}) {
