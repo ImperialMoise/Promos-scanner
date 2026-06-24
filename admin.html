@@ -40,7 +40,9 @@
       margin-bottom: 16px;
     }
 
-    input {
+    input,
+textarea,
+select {
       width: 100%;
       box-sizing: border-box;
       padding: 12px;
@@ -48,6 +50,16 @@
       border-radius: 8px;
       font-size: 16px;
       margin-top: 8px;
+    }
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 700;
     }
 
     button,
@@ -234,81 +246,155 @@
     }
 
     function renderOffers(offers) {
-      if (!offers.length) {
-        offersList.innerHTML = `
-          <article class="card">
-            <h2>Aucune offre en attente</h2>
-            <p class="muted">Relance le scanner pour détecter de nouvelles offres.</p>
-          </article>
-        `;
-        return;
-      }
+  if (!offers.length) {
+    offersList.innerHTML = `
+      <article class="card">
+        <h2>Aucune offre en attente</h2>
+        <p class="muted">Relance le scanner pour détecter de nouvelles offres.</p>
+      </article>
+    `;
+    return;
+  }
 
-      offersList.innerHTML = offers.map((offer) => `
-        <article class="card">
-          <h2>${escapeHtml(offer.title)}</h2>
+  offersList.innerHTML = offers.map((offer) => `
+    <article class="card" data-offer-id="${offer.id}">
+      <h2>${escapeHtml(offer.title)}</h2>
 
-          <div class="meta">
-            <span class="pill">${escapeHtml(offer.brand)}</span>
-            <span class="pill">${escapeHtml(offer.city || "Bordeaux")}</span>
-            <span class="pill">${escapeHtml(offer.category || "new")}</span>
-            <span class="pill">Score ${escapeHtml(offer.confidence_score)}</span>
-            <span class="pill">${escapeHtml(offer.price || "Prix à vérifier")}</span>
-          </div>
+      <div class="meta">
+        <span class="pill">${escapeHtml(offer.brand)}</span>
+        <span class="pill">${escapeHtml(offer.city || "Bordeaux")}</span>
+        <span class="pill">${escapeHtml(offer.category || "new")}</span>
+        <span class="pill">Score ${escapeHtml(offer.confidence_score)}</span>
+        <span class="pill">${escapeHtml(offer.price || "Prix à vérifier")}</span>
+      </div>
 
-          <p>${escapeHtml(offer.description || "Pas de description.")}</p>
+      <label>
+        Titre
+        <input data-field="title" value="${escapeHtml(offer.title)}" />
+      </label>
 
-          <p class="muted">
-            Détectée le ${escapeHtml(new Date(offer.detected_at).toLocaleString("fr-FR"))}
-          </p>
+      <label>
+        Description
+        <textarea data-field="description">${escapeHtml(offer.description || "")}</textarea>
+      </label>
 
-          <div class="actions">
-            <button class="primary" type="button" onclick="updateOffer(${offer.id}, 'publish')">
-              Publier
-            </button>
+      <label>
+        Prix
+        <input data-field="price" value="${escapeHtml(offer.price || "")}" placeholder="Ex : 6 €" />
+      </label>
 
-            <button class="danger" type="button" onclick="updateOffer(${offer.id}, 'reject')">
-              Rejeter
-            </button>
+      <label>
+        Ancien prix
+        <input data-field="old_price" value="${escapeHtml(offer.old_price || "")}" placeholder="Ex : 9.90 €" />
+      </label>
 
-            ${
-              offer.source_url
-                ? `<a class="button secondary" href="${escapeHtml(offer.source_url)}" target="_blank" rel="noopener noreferrer">Ouvrir la source</a>`
-                : ""
-            }
-          </div>
-        </article>
-      `).join("");
-    }
+      <label>
+        Catégorie
+        <select data-field="category">
+          <option value="flash" ${offer.category === "flash" ? "selected" : ""}>Flash</option>
+          <option value="student" ${offer.category === "student" ? "selected" : ""}>Étudiant</option>
+          <option value="night" ${offer.category === "night" ? "selected" : ""}>Soir</option>
+          <option value="new" ${offer.category === "new" ? "selected" : ""}>Nouveau</option>
+        </select>
+      </label>
 
-    async function updateOffer(id, action) {
-      const secret = getSecret();
-      const label = action === "publish" ? "publication" : "rejet";
+      <label>
+        Badge
+        <input data-field="badge" value="${escapeHtml(offer.badge || "")}" placeholder="Ex : Bon plan" />
+      </label>
 
-      setMessage(`${label} en cours...`);
+      <label>
+        Source
+        <input data-field="source_url" value="${escapeHtml(offer.source_url || "")}" />
+      </label>
 
-      const response = await fetch("/api/admin-update-offer", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          secret,
-          id,
-          action,
-        }),
-      });
+      <p class="muted">
+        Détectée le ${escapeHtml(new Date(offer.detected_at).toLocaleString("fr-FR"))}
+      </p>
 
-      const data = await response.json();
+      <div class="actions">
+        <button class="secondary" type="button" onclick="updateOffer(${offer.id}, 'save')">
+          Sauvegarder
+        </button>
 
-      if (!data.ok) {
-        setMessage(data.error || "Action impossible.");
-        return;
-      }
+        <button class="primary" type="button" onclick="updateOffer(${offer.id}, 'publish')">
+          Publier
+        </button>
 
-      setMessage(action === "publish" ? "Offre publiée." : "Offre rejetée.");
-      await loadOffers();
-    }
+        <button class="danger" type="button" onclick="updateOffer(${offer.id}, 'reject')">
+          Rejeter
+        </button>
+
+        ${
+          offer.source_url
+            ? `<a class="button secondary" href="${escapeHtml(offer.source_url)}" target="_blank" rel="noopener noreferrer">Ouvrir la source</a>`
+            : ""
+        }
+      </div>
+    </article>
+  `).join("");
+}
+
+    function getOfferEdits(id) {
+  const card = document.querySelector(`[data-offer-id="${id}"]`);
+
+  if (!card) return {};
+
+  const edits = {};
+
+  card.querySelectorAll("[data-field]").forEach((field) => {
+    edits[field.dataset.field] = field.value;
+  });
+
+  return edits;
+}
+
+async function updateOffer(id, action) {
+  const secret = getSecret();
+  const edits = getOfferEdits(id);
+
+  const labels = {
+    save: "sauvegarde",
+    publish: "publication",
+    reject: "rejet",
+  };
+
+  setMessage(`${labels[action]} en cours...`);
+
+  const response = await fetch("/api/admin-update-offer", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      secret,
+      id,
+      action,
+      edits,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!data.ok) {
+    setMessage(data.error || "Action impossible.");
+    return;
+  }
+
+  if (action === "save") {
+    setMessage("Offre sauvegardée.");
+  }
+
+  if (action === "publish") {
+    setMessage("Offre publiée.");
+  }
+
+  if (action === "reject") {
+    setMessage("Offre rejetée.");
+  }
+
+  await loadOffers();
+}
 
     saveSecretButton.addEventListener("click", async () => {
       const secret = secretInput.value.trim();
