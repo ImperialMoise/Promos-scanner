@@ -40,12 +40,18 @@ function splitSentences(text) {
 }
 
 function hasFinancialSignal(text) {
-  return /(-\s?\d+%|\d+\s?%|promo|promotion|offre|réduction|reduction|remise|gratuit|offert|coupon|code promo|bon plan|deal|moins cher|prix spécial|prix reduit|prix réduit|étudiant|student|mardi|jeudi|happy hour|1\s?acheté|1\s?achetée|2\s?pour\s?1|coupe du monde|world cup|\d+[,.]?\d*\s?(€|euros?))/i.test(text);
+  const lower = text.toLowerCase();
+
+  if (/(100\s?%\s?(français|française|boeuf|bœuf|pur|naturel|frais|maison|qualité|halal|viande))/i.test(lower)) {
+    return false;
+  }
+
+  return /(-\s?\d+%|promo|promotion|offre|réduction|reduction|remise|gratuit|offert|coupon|code promo|bon plan|deal|moins cher|prix spécial|prix reduit|prix réduit|étudiant|student|mardi|jeudi|happy hour|1\s?acheté|1\s?achetée|1\s?acheté\(s\)|1\s?offert|1\s?offert\(s\)|2\s?pour\s?1|coupe du monde|world cup|\d+[,.]?\d*\s?(€|euros?))/i.test(lower);
 }
 
 function hasOnlyRestaurantDescription(text) {
-  return /(produits frais|viande de race|préparés avec|préparées avec|nos burgers|notre restaurant|venez découvrir|bienvenue|livraison|commande en ligne|horaires|adresse|nous contacter|halal|fait maison|qualité|saveur|délicieux)/i.test(text)
-    && !hasFinancialSignal(text);
+  return /(produits frais|viande de race|viande 100|100\s?%\s?française|100\s?%\s?français|fromage est soigneusement|goût unique|fraîcheur|authenticité|préparés avec|préparées avec|nos burgers|notre restaurant|venez découvrir|bienvenue|livraison|commande en ligne|horaires|adresse|nous contacter|halal|fait maison|qualité|saveur|délicieux)/i.test(text)
+    && !/(promo|promotion|offre|réduction|reduction|remise|gratuit|offert|coupon|code promo|bon plan|deal|moins cher|prix spécial|étudiant|student|mardi|jeudi|happy hour|1\s?acheté|1\s?achetée|1\s?offert|2\s?pour\s?1|-\s?\d+%|\d+[,.]?\d*\s?(€|euros?))/i.test(text);
 }
 
 function extractPrice(text) {
@@ -64,7 +70,7 @@ function scoreSentence(sentence, source) {
     if (lower.includes(keyword.toLowerCase())) score += 1;
   }
 
-  if (/-\s?\d+%|\d+\s?%/i.test(sentence)) score += 8;
+  if (/-\s?\d+%/i.test(sentence)) score += 8;
   if (/\d+[,.]?\d*\s?(€|euros?)/i.test(sentence)) score += 6;
 
   if (/(promo|promotion|réduction|reduction|remise|coupon|code promo|bon plan|deal)/i.test(sentence)) score += 7;
@@ -92,7 +98,7 @@ function buildOfferCandidate(sentence, source) {
 
     badge: /étudiant|student/i.test(cleanSentence)
       ? "Étudiant"
-      : /-\s?\d+%|\d+\s?%/i.test(cleanSentence)
+      : /-\s?\d+%/i.test(cleanSentence)
         ? "Réduction"
         : /gratuit|offert|1\s?acheté|1\s?achetée|2\s?pour\s?1/i.test(cleanSentence)
           ? "Offert"
