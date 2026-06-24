@@ -179,6 +179,78 @@ select {
       <a class="button secondary" href="/profile.html">Mon profil</a>
     </section>
 
+    <section class="card hidden" id="createOfferBox">
+  <h2>Ajouter une offre manuelle</h2>
+  <p class="muted">
+    À utiliser pour les offres visibles sur appli/site mais non scannables automatiquement.
+  </p>
+
+  <label>
+    Enseigne
+    <input id="manualBrand" placeholder="Ex : Burger King" />
+  </label>
+
+  <label>
+    Titre de l’offre
+    <input id="manualTitle" placeholder="Ex : 1 acheté = 1 offert sur le Whopper" />
+  </label>
+
+  <label>
+    Description
+    <textarea id="manualDescription" placeholder="Ex : Offre vue sur Uber Eats Bordeaux Sainte-Catherine."></textarea>
+  </label>
+
+  <label>
+    Prix
+    <input id="manualPrice" placeholder="Ex : 6,99 € ou -30%" />
+  </label>
+
+  <label>
+    Ancien prix
+    <input id="manualOldPrice" placeholder="Ex : 12,99 €" />
+  </label>
+
+  <label>
+    Catégorie
+    <select id="manualCategory">
+      <option value="flash">Flash</option>
+      <option value="student">Étudiant</option>
+      <option value="night">Soir</option>
+      <option value="new">Nouveau</option>
+    </select>
+  </label>
+
+  <label>
+    Type d’aliment
+    <select id="manualFoodType">
+      <option value="burger">Burger</option>
+      <option value="chicken">Chicken</option>
+      <option value="pizza">Pizza</option>
+      <option value="tacos">Tacos</option>
+      <option value="sandwich">Sandwich</option>
+    </select>
+  </label>
+
+  <label>
+    Badge
+    <input id="manualBadge" placeholder="Ex : Offert, Réduction, Étudiant" />
+  </label>
+
+  <label>
+    Source
+    <input id="manualSourceUrl" placeholder="Lien vers la page ou l’app si disponible" />
+  </label>
+
+  <div class="actions">
+    <button class="secondary" type="button" id="saveManualPendingButton">
+      Ajouter en pending
+    </button>
+    <button class="primary" type="button" id="saveManualPublishedButton">
+      Publier directement
+    </button>
+  </div>
+</section>
+
     <div class="message hidden" id="message"></div>
 
     <section class="grid" id="offersList"></section>
@@ -193,6 +265,18 @@ select {
     const toolbar = document.getElementById("toolbar");
     const message = document.getElementById("message");
     const offersList = document.getElementById("offersList");
+    const createOfferBox = document.getElementById("createOfferBox");
+const manualBrand = document.getElementById("manualBrand");
+const manualTitle = document.getElementById("manualTitle");
+const manualDescription = document.getElementById("manualDescription");
+const manualPrice = document.getElementById("manualPrice");
+const manualOldPrice = document.getElementById("manualOldPrice");
+const manualCategory = document.getElementById("manualCategory");
+const manualFoodType = document.getElementById("manualFoodType");
+const manualBadge = document.getElementById("manualBadge");
+const manualSourceUrl = document.getElementById("manualSourceUrl");
+const saveManualPendingButton = document.getElementById("saveManualPendingButton");
+const saveManualPublishedButton = document.getElementById("saveManualPublishedButton");
 
     function getSecret() {
       return localStorage.getItem("promosScannerAdminSecret") || "";
@@ -204,15 +288,17 @@ select {
     }
 
     function showAdmin() {
-      loginBox.classList.add("hidden");
-      toolbar.classList.remove("hidden");
-    }
+  loginBox.classList.add("hidden");
+  toolbar.classList.remove("hidden");
+  createOfferBox.classList.remove("hidden");
+}
 
     function showLogin() {
-      loginBox.classList.remove("hidden");
-      toolbar.classList.add("hidden");
-      offersList.innerHTML = "";
-    }
+  loginBox.classList.remove("hidden");
+  toolbar.classList.add("hidden");
+  createOfferBox.classList.add("hidden");
+  offersList.innerHTML = "";
+}
 
     function escapeHtml(value) {
       return String(value || "")
@@ -397,6 +483,60 @@ async function updateOffer(id, action) {
   await loadOffers();
 }
 
+    async function createManualOffer(status) {
+  const secret = getSecret();
+
+  if (!manualBrand.value.trim() || !manualTitle.value.trim()) {
+    setMessage("Ajoute au minimum une enseigne et un titre.");
+    return;
+  }
+
+  setMessage("Création de l’offre manuelle...");
+
+  const response = await fetch("/api/admin-create-offer", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      secret,
+      offer: {
+        brand: manualBrand.value,
+        title: manualTitle.value,
+        description: manualDescription.value,
+        price: manualPrice.value,
+        old_price: manualOldPrice.value,
+        category: manualCategory.value,
+        food_types: [manualFoodType.value],
+        badge: manualBadge.value,
+        source_url: manualSourceUrl.value,
+        status,
+        city: "Bordeaux",
+      },
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!data.ok) {
+    setMessage(data.error || "Création impossible.");
+    return;
+  }
+
+  manualBrand.value = "";
+  manualTitle.value = "";
+  manualDescription.value = "";
+  manualPrice.value = "";
+  manualOldPrice.value = "";
+  manualBadge.value = "";
+  manualSourceUrl.value = "";
+
+  setMessage(status === "published" ? "Offre créée et publiée." : "Offre ajoutée en pending.");
+  await loadOffers();
+}
+
+saveManualPendingButton.addEventListener("click", () => createManualOffer("pending"));
+saveManualPublishedButton.addEventListener("click", () => createManualOffer("published"));
     saveSecretButton.addEventListener("click", async () => {
       const secret = secretInput.value.trim();
 
