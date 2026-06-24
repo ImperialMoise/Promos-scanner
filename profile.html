@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Mon Profil — FastOffres</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Montserrat:wght@700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            tertiary: "#705d00",
+            "inverse-surface": "#2e3132",
+            "on-secondary-container": "#63627a",
+            outline: "#8e7164",
+            "on-primary": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            secondary: "#5d5c74",
+            "on-secondary": "#ffffff",
+            "surface-variant": "#e1e3e4",
+            "on-tertiary-fixed-variant": "#544600",
+            "surface-container-high": "#e7e8e9",
+            "on-tertiary": "#ffffff",
+            "error-container": "#ffdad6",
+            "tertiary-fixed": "#ffe16d",
+            "primary-container": "#ff6b00",
+            "on-primary-fixed": "#351000",
+            "on-tertiary-fixed": "#221b00",
+            surface: "#f8f9fa",
+            "tertiary-container": "#c9a900",
+            "surface-dim": "#d9dadb",
+            "surface-container-low": "#f3f4f5",
+            "secondary-fixed": "#e2e0fc",
+            "surface-container-highest": "#e1e3e4",
+            primary: "#a04100",
+            error: "#ba1a1a",
+            "on-error-container": "#93000a",
+            "inverse-on-surface": "#f0f1f2",
+            background: "#f8f9fa",
+            "on-surface": "#191c1d",
+            "primary-fixed-dim": "#ffb693",
+            "on-primary-container": "#572000",
+            "on-secondary-fixed-variant": "#45455b",
+            "secondary-fixed-dim": "#c6c4df",
+            "surface-bright": "#f8f9fa",
+            "surface-container": "#edeeef",
+            "on-background": "#191c1d",
+            "inverse-primary": "#ffb693",
+            "on-surface-variant": "#5a4136",
+            "on-tertiary-container": "#4c3e00",
+            "outline-variant": "#e2bfb0",
+            "secondary-container": "#e2e0fc",
+            "tertiary-fixed-dim": "#e9c400",
+            "surface-tint": "#a04100",
+            "primary-fixed": "#ffdbcc",
+            "on-error": "#ffffff",
+            "on-primary-fixed-variant": "#7a3000",
+            "on-secondary-fixed": "#1a1a2e"
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px"
+          },
+          spacing: {
+            xs: "4px",
+            "container-max": "1200px",
+            lg: "48px",
+            sm: "12px",
+            base: "8px",
+            md: "24px",
+            gutter: "16px"
+          },
+          fontFamily: {
+            "label-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-sm": ["Montserrat"],
+            "display-lg": ["Montserrat"],
+            "display-lg-mobile": ["Montserrat"],
+            "headline-md": ["Montserrat"],
+            "body-lg": ["Inter"],
+            "label-bold": ["Inter"]
+          },
+          fontSize: {
+            "label-sm": ["12px", { lineHeight: "14px", fontWeight: "500" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "headline-sm": ["20px", { lineHeight: "26px", fontWeight: "700" }],
+            "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "display-lg-mobile": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+            "label-bold": ["14px", { lineHeight: "16px", fontWeight: "700" }]
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    .material-symbols-outlined {
+      font-family: "Material Symbols Outlined";
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: "liga";
+      -webkit-font-smoothing: antialiased;
+      font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    button,
+    a,
+    input {
+      font: inherit;
+    }
+  </style>
+</head>
+
+<body class="flex min-h-screen flex-col bg-background font-body-md text-body-md text-on-background antialiased">
+  <header class="sticky top-0 z-50 border-b border-surface-variant bg-surface">
+    <nav class="mx-auto flex w-full max-w-container-max items-center justify-between px-md py-sm">
+      <a class="font-display-lg text-display-lg-mobile font-black text-primary md:text-display-lg" href="/">
+        FastOffres
+      </a>
+
+      <div class="hidden items-center gap-lg md:flex">
+        <a class="font-label-bold text-label-bold text-on-surface-variant transition-colors hover:text-primary" href="/#deals">
+          Offres du Jour
+        </a>
+        <a class="font-label-bold text-label-bold text-on-surface-variant transition-colors hover:text-primary" href="/#categories">
+          Par Enseignes
+        </a>
+      </div>
+
+      <a class="border-b-2 border-primary pb-1 font-label-bold text-label-bold text-primary" href="/profile.html">
+        Mon Profil
+      </a>
+    </nav>
+  </header>
+
+  <main class="mx-auto flex w-full max-w-container-max flex-grow flex-col gap-lg px-gutter py-lg md:px-md">
+    <section class="border-b border-surface-variant pb-md">
+      <p class="mb-xs font-label-bold text-label-bold uppercase tracking-wide text-primary">
+        Espace personnel
+      </p>
+      <h1 class="font-display-lg text-display-lg-mobile font-black text-on-surface md:text-display-lg">
+        Mon Profil
+      </h1>
+      <div class="mt-xs flex items-center gap-xs text-on-surface-variant">
+        <span class="material-symbols-outlined text-[20px]">location_on</span>
+        <span>Bordeaux</span>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-md md:grid-cols-2">
+      <article class="rounded-xl border border-surface-variant bg-surface-container-lowest p-md shadow-sm">
+        <div class="flex items-start justify-between gap-md">
+          <div class="flex items-center gap-sm">
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-on-secondary">
+              <span class="material-symbols-outlined">school</span>
+            </div>
+            <div>
+              <h2 class="font-headline-sm text-headline-sm text-on-surface">Mon statut</h2>
+              <p class="font-body-md text-body-md text-on-surface-variant">
+                Activer les offres étudiantes dans tes recherches.
+              </p>
+            </div>
+          </div>
+
+          <label class="relative inline-flex cursor-pointer items-center">
+            <input id="studentToggle" class="peer sr-only" type="checkbox" />
+            <div class="h-6 w-11 rounded-full bg-surface-variant after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-container peer-checked:after:translate-x-full"></div>
+          </label>
+        </div>
+      </article>
+
+      <article class="rounded-xl border border-primary-fixed-dim bg-primary-fixed p-md shadow-sm">
+        <div class="flex items-center gap-sm">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-on-primary">
+            <span class="material-symbols-outlined">admin_panel_settings</span>
+          </div>
+          <div>
+            <h2 class="font-headline-sm text-headline-sm text-on-primary-fixed">Accès admin</h2>
+            <p class="font-body-md text-body-md text-on-primary-fixed-variant">
+              Entre ton code pour gérer les offres détectées.
+            </p>
+          </div>
+        </div>
+
+        <form class="mt-md flex flex-col gap-sm" id="adminForm">
+          <label class="font-label-bold text-label-bold text-on-primary-fixed-variant" for="adminSecret">
+            Code admin
+          </label>
+          <input
+            id="adminSecret"
+            class="rounded-lg border border-outline-variant bg-surface-container-lowest px-sm py-sm text-on-surface outline-none transition focus:border-primary focus:ring-2 focus:ring-primary"
+            type="password"
+            placeholder="Ex : fastoffres2026"
+            autocomplete="off"
+          />
+
+          <div class="flex flex-wrap gap-sm">
+            <button class="rounded-lg bg-primary px-md py-sm font-label-bold text-label-bold text-on-primary transition hover:bg-surface-tint" type="submit">
+              Accéder à l’admin
+            </button>
+
+            <button class="rounded-lg border border-primary bg-transparent px-md py-sm font-label-bold text-label-bold text-primary transition hover:bg-surface-container" type="button" id="forgetSecretButton">
+              Oublier le code
+            </button>
+          </div>
+
+          <p class="hidden rounded-lg border border-primary-fixed-dim bg-surface-container-lowest px-sm py-sm font-label-bold text-label-bold text-primary" id="adminMessage"></p>
+        </form>
+      </article>
+    </section>
+
+    <section class="flex flex-col gap-sm">
+      <h2 class="font-headline-sm text-headline-sm text-on-surface">Mes alertes</h2>
+
+      <div class="grid grid-cols-1 gap-sm md:grid-cols-2">
+        <article class="flex items-center justify-between rounded-lg border border-surface-variant bg-surface-container-lowest p-sm">
+          <div class="flex items-center gap-sm">
+            <div class="flex h-12 w-12 items-center justify-center rounded-full border border-surface-variant bg-surface-bright">
+              🍔
+            </div>
+            <span class="font-label-bold text-label-bold text-on-surface">Burger King</span>
+          </div>
+          <button class="p-sm text-primary-container" type="button" aria-label="Alerte Burger King active">
+            <span class="material-symbols-outlined">notifications_active</span>
+          </button>
+        </article>
+
+        <article class="flex items-center justify-between rounded-lg border border-surface-variant bg-surface-container-lowest p-sm">
+          <div class="flex items-center gap-sm">
+            <div class="flex h-12 w-12 items-center justify-center rounded-full border border-surface-variant bg-surface-bright">
+              🍕
+            </div>
+            <span class="font-label-bold text-label-bold text-on-surface">Domino’s Pizza</span>
+          </div>
+          <button class="p-sm text-surface-variant" type="button" aria-label="Alerte Domino’s désactivée">
+            <span class="material-symbols-outlined">notifications_off</span>
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-sm overflow-hidden">
+      <div class="flex items-end justify-between">
+        <h2 class="font-headline-sm text-headline-sm text-on-surface">Mes offres favorites</h2>
+        <a class="font-label-sm text-label-sm text-primary hover:underline" href="/#deals">
+          Voir tout
+        </a>
+      </div>
+
+      <div class="no-scrollbar flex gap-md overflow-x-auto pb-md">
+        <article class="relative min-w-[280px] overflow-hidden rounded-xl border border-surface-variant bg-surface-container-lowest">
+          <div class="absolute left-sm top-sm z-10 rounded bg-secondary px-sm py-xs font-label-sm text-label-sm text-on-secondary">
+            Étudiant
+          </div>
+          <div class="h-32 bg-surface-variant">
+            <img class="h-full w-full object-cover" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80" alt="Pizza" />
+          </div>
+          <div class="flex flex-col gap-xs p-sm">
+            <h3 class="font-label-bold text-label-bold text-on-surface">Domino’s Pizza</h3>
+            <p class="font-headline-md text-headline-md text-primary">1 achetée = 1 offerte</p>
+            <p class="font-label-sm text-label-sm text-on-surface-variant">Exemple de favori</p>
+          </div>
+        </article>
+
+        <article class="relative min-w-[280px] overflow-hidden rounded-xl border border-surface-variant bg-surface-container-lowest">
+          <div class="absolute left-sm top-sm z-10 flex items-center gap-xs rounded bg-tertiary-fixed px-sm py-xs font-label-sm text-label-sm text-on-tertiary-fixed">
+            <span class="material-symbols-outlined text-[14px]">schedule</span>
+            Flash
+          </div>
+          <div class="h-32 bg-surface-variant">
+            <img class="h-full w-full object-cover" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80" alt="Burger" />
+          </div>
+          <div class="flex flex-col gap-xs p-sm">
+            <h3 class="font-label-bold text-label-bold text-on-surface">Burger King</h3>
+            <p class="font-headline-md text-headline-md text-primary">Menu bon plan</p>
+            <p class="font-label-sm text-label-sm text-on-surface-variant">Exemple de favori</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="mt-md flex flex-col justify-end gap-sm border-t border-surface-variant pt-md sm:flex-row">
+      <a class="rounded-lg border-2 border-primary-container px-lg py-sm text-center font-headline-sm text-headline-sm font-bold text-primary-container transition hover:bg-surface-container" href="/">
+        Retour aux offres
+      </a>
+      <a class="rounded-lg bg-primary-container px-lg py-sm text-center font-headline-sm text-headline-sm font-bold text-white shadow-md transition hover:bg-primary" href="/admin.html" id="adminShortcut">
+        Admin
+      </a>
+    </section>
+  </main>
+
+  <footer class="mt-auto flex w-full flex-col items-center gap-md bg-on-secondary-fixed px-md py-lg text-primary-fixed">
+    <div class="font-headline-md text-headline-md font-black text-primary-container">FastOffres</div>
+    <div class="flex flex-wrap justify-center gap-md">
+      <a class="font-label-sm text-label-sm text-surface-variant opacity-80 transition hover:text-primary-container" href="/">Villes</a>
+      <a class="font-label-sm text-label-sm text-surface-variant opacity-80 transition hover:text-primary-container" href="/">Mentions Légales</a>
+      <a class="font-label-sm text-label-sm text-surface-variant opacity-80 transition hover:text-primary-container" href="/">Confidentialité</a>
+      <a class="font-label-sm text-label-sm text-surface-variant opacity-80 transition hover:text-primary-container" href="/">Aide</a>
+    </div>
+    <div class="mt-sm text-center font-body-md text-body-md text-surface-dim">© 2026 FastOffres. Tous droits réservés.</div>
+  </footer>
+
+  <script>
+    const adminForm = document.getElementById("adminForm");
+    const adminSecret = document.getElementById("adminSecret");
+    const adminMessage = document.getElementById("adminMessage");
+    const forgetSecretButton = document.getElementById("forgetSecretButton");
+    const studentToggle = document.getElementById("studentToggle");
+
+    const savedSecret = localStorage.getItem("promosScannerAdminSecret");
+    const savedStudent = localStorage.getItem("promosScannerStudent") === "true";
+
+    if (savedSecret) {
+      adminSecret.value = savedSecret;
+    }
+
+    studentToggle.checked = savedStudent;
+
+    function showMessage(text) {
+      adminMessage.textContent = text;
+      adminMessage.classList.remove("hidden");
+    }
+
+    adminForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const secret = adminSecret.value.trim();
+
+      if (!secret) {
+        showMessage("Entre ton code admin.");
+        return;
+      }
+
+      localStorage.setItem("promosScannerAdminSecret", secret);
+      showMessage("Code enregistré. Redirection vers l’admin...");
+
+      window.location.href = "/admin.html";
+    });
+
+    forgetSecretButton.addEventListener("click", () => {
+      localStorage.removeItem("promosScannerAdminSecret");
+      adminSecret.value = "";
+      showMessage("Code admin oublié.");
+    });
+
+    studentToggle.addEventListener("change", () => {
+      localStorage.setItem("promosScannerStudent", String(studentToggle.checked));
+    });
+  </script>
+</body>
+</html>

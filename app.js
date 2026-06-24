@@ -139,10 +139,10 @@ function Header() {
           </li>
         </ul>
 
-        <button className="flex items-center justify-center rounded-full p-sm font-label-bold text-label-bold text-primary transition-colors duration-100 hover:bg-surface-container" type="button">
-          <Icon name="person" fill={false} />
-          <span className="ml-xs hidden md:inline">Mon Profil</span>
-        </button>
+        <a className="flex items-center justify-center rounded-full p-sm font-label-bold text-label-bold text-primary transition-colors duration-100 hover:bg-surface-container" href="/profile.html">
+  <Icon name="person" fill={false} />
+  <span className="ml-xs hidden md:inline">Mon Profil</span>
+</a>
       </nav>
     </header>
   );
