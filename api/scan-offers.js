@@ -80,6 +80,7 @@ function buildOfferCandidate(sentence, source) {
     source_url: source.url,
     source_id: source.id,
     source_type: source.type,
+    food_types: source.food_types || [],
     status: "pending",
     confidence_score: Math.min(100, 45 + scoreSentence(sentence, source) * 8),
     detected_at: now,

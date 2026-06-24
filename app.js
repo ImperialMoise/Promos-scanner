@@ -40,6 +40,7 @@ function normalizeOffer(offer) {
     city: offer.city || "Bordeaux",
     sourceUrl: offer.source_url,
     description: offer.description,
+    foodTypes: offer.food_types || [],
     confidenceScore: offer.confidence_score,
   };
 }
@@ -280,7 +281,7 @@ function App() {
 
     client
       .from("offers")
-      .select("id, title, description, brand, badge, badge_icon, category, city, image, old_price, price, distance, source_url, confidence_score, last_seen_at")
+      .select("id, title, description, brand, badge, badge_icon, category, city, image, old_price, price, distance, source_url, food_types, confidence_score, last_seen_at")
       .eq("status", "published")
       .order("last_seen_at", { ascending: false })
       .limit(20)
