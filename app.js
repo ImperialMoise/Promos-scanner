@@ -1,4 +1,4 @@
-const deals = [
+const fallbackDeals = [
   {
     id: 1,
     title: "Mardi Fou",
@@ -78,6 +78,39 @@ const categories = [
     image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=80",
   },
 ];
+
+function normalizeOffer(offer) {
+  return {
+    id: offer.id,
+    title: offer.title,
+    brand: offer.brand,
+    badge: offer.badge || "Vérifiée",
+    badgeIcon: offer.badge_icon || "verified",
+    badgeClass: badgeClassForCategory(offer.category),
+    image: offer.image || imageForCategory(offer.category),
+    oldPrice: offer.old_price,
+    price: offer.price || "À vérifier",
+    distance: offer.distance || "Bordeaux",
+    category: offer.category || "new",
+    city: offer.city || "Bordeaux",
+    sourceUrl: offer.source_url,
+    confidenceScore: offer.confidence_score,
+  };
+}
+
+function badgeClassForCategory(category) {
+  if (category === "student") return "bg-secondary text-on-secondary border border-secondary-fixed-dim";
+  if (category === "night") return "bg-primary-container text-on-primary-container border border-primary";
+  if (category === "flash") return "bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary-fixed-dim";
+  return "bg-tertiary text-on-tertiary border border-tertiary";
+}
+
+function imageForCategory(category) {
+  if (category === "student") return "https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&w=900&q=80";
+  if (category === "night") return "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=900&q=80";
+  if (category === "flash") return "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80";
+  return "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=80";
+}
 
 function Icon({ name, className = "", fill = true }) {
   const style = { fontVariationSettings: `'FILL' ${fill ? 1 : 0}, 'wght' 400, 'GRAD' 0, 'opsz' 24` };
@@ -260,6 +293,48 @@ function App() {
   const [searchedCity, setSearchedCity] = React.useState("Bordeaux");
   const [category, setCategory] = React.useState("all");
   const [message, setMessage] = React.useState("");
+  const [deals, setDeals] = React.useState(fallbackDeals);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [dataMode, setDataMode] = React.useState("demo");
+
+  React.useEffect(() => {
+    const config = window.FASTOFFRES_CONFIG || {};
+
+    if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase) {
+      setDataMode("demo");
+      setMessage("Mode démo : ajoute tes clés Supabase dans index.html pour afficher les offres publiées de la base.");
+      return;
+    }
+
+    const client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+    setIsLoading(true);
+
+    client
+      .from("offers")
+      .select("id, title, brand, badge, badge_icon, category, city, image, old_price, price, distance, source_url, confidence_score, last_seen_at")
+      .eq("status", "published")
+      .order("last_seen_at", { ascending: false })
+      .limit(20)
+      .then(({ data, error }) => {
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setDeals(data.map(normalizeOffer));
+          setDataMode("supabase");
+          setMessage(`${data.length} offre(s) publiée(s) chargée(s) depuis Supabase.`);
+        } else {
+          setDeals(fallbackDeals);
+          setDataMode("empty");
+          setMessage("Supabase est connecté, mais aucune offre publiée pour l'instant. Les cartes de démo restent affichées.");
+        }
+      })
+      .catch((error) => {
+        setDeals(fallbackDeals);
+        setDataMode("error");
+        setMessage(`Lecture Supabase impossible : ${error.message}. Les cartes de démo restent affichées.`);
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const filteredDeals = deals.filter((deal) => category === "all" || deal.category === category);
 
@@ -297,8 +372,12 @@ function App() {
           </div>
         )}
 
-        <div className="font-label-bold text-label-bold text-on-surface-variant">
-          Ville active : <span className="text-primary">{searchedCity}</span>
+        <div className="flex flex-wrap items-center gap-sm font-label-bold text-label-bold text-on-surface-variant">
+          <span>Ville active : <span className="text-primary">{searchedCity}</span></span>
+          <span className="rounded-full bg-surface-container px-sm py-xs text-label-sm uppercase tracking-wide">
+            Source : {dataMode === "supabase" ? "Supabase" : "Démo"}
+          </span>
+          {isLoading && <span className="text-primary">Chargement des offres...</span>}
         </div>
 
         <DealsSection dealsToShow={filteredDeals} onSelect={handleSelectDeal} onReset={handleReset} />
