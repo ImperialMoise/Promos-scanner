@@ -39,6 +39,15 @@ function splitSentences(text) {
     .filter((part) => part.length >= 24 && part.length <= 260);
 }
 
+function hasFinancialSignal(text) {
+  return /(-\s?\d+%|\d+\s?%|promo|promotion|offre|réduction|reduction|remise|gratuit|offert|coupon|code promo|bon plan|deal|moins cher|prix spécial|prix reduit|prix réduit|étudiant|student|mardi|jeudi|happy hour|1\s?acheté|1\s?achetée|2\s?pour\s?1|coupe du monde|world cup|\d+[,.]?\d*\s?(€|euros?))/i.test(text);
+}
+
+function hasOnlyRestaurantDescription(text) {
+  return /(produits frais|viande de race|préparés avec|préparées avec|nos burgers|notre restaurant|venez découvrir|bienvenue|livraison|commande en ligne|horaires|adresse|nous contacter|halal|fait maison|qualité|saveur|délicieux)/i.test(text)
+    && !hasFinancialSignal(text);
+}
+
 function extractPrice(text) {
   const match = text.match(/(?:\d+[,.]?\d*)\s?(?:€|euros?)/i);
   return match ? match[0].replace(/euros?/i, "€") : null;
@@ -48,15 +57,21 @@ function scoreSentence(sentence, source) {
   const lower = sentence.toLowerCase();
   let score = 0;
 
+  if (hasOnlyRestaurantDescription(sentence)) return 0;
+  if (!hasFinancialSignal(sentence)) return 0;
+
   for (const keyword of source.keywords || []) {
-    if (lower.includes(keyword.toLowerCase())) score += 2;
+    if (lower.includes(keyword.toLowerCase())) score += 1;
   }
 
-  if (/\d+[,.]?\d*\s?(€|euros?)/i.test(sentence)) score += 3;
+  if (/-\s?\d+%|\d+\s?%/i.test(sentence)) score += 8;
+  if (/\d+[,.]?\d*\s?(€|euros?)/i.test(sentence)) score += 6;
 
-  if (/(offre|promo|deal|menu|réduction|reduction|gratuit|mardi|jeudi|étudiant|student|coupon|code|fidélité|app|livraison|formule)/i.test(sentence)) {
-    score += 2;
-  }
+  if (/(promo|promotion|réduction|reduction|remise|coupon|code promo|bon plan|deal)/i.test(sentence)) score += 7;
+  if (/(gratuit|offert|1\s?acheté|1\s?achetée|2\s?pour\s?1)/i.test(sentence)) score += 7;
+  if (/(étudiant|student)/i.test(sentence)) score += 6;
+  if (/(mardi|jeudi|happy hour|soir|week-end|coupe du monde|world cup)/i.test(sentence)) score += 4;
+  if (/(menu|formule|box|bucket|burger|pizza|tacos|sandwich)/i.test(sentence)) score += 2;
 
   if (lower.includes(source.brand.toLowerCase().split(" ")[0])) score += 1;
 
@@ -64,25 +79,48 @@ function scoreSentence(sentence, source) {
 }
 
 function buildOfferCandidate(sentence, source) {
-  const price = extractPrice(sentence);
+  const cleanSentence = sentence.replace(/\s+/g, " ").trim();
+  const price = extractPrice(cleanSentence);
   const now = new Date().toISOString();
 
   return {
     brand: source.brand,
-    title: sentence.length > 72 ? `${sentence.slice(0, 69).trim()}...` : sentence,
-    description: sentence,
+    title: cleanSentence.length > 72 ? `${cleanSentence.slice(0, 69).trim()}...` : cleanSentence,
+    description: cleanSentence,
     price,
     old_price: null,
-    badge: price ? "Offre détectée" : "À vérifier",
-    badge_icon: price ? "local_fire_department" : "visibility",
-    category: price ? "flash" : "new",
+
+    badge: /étudiant|student/i.test(cleanSentence)
+      ? "Étudiant"
+      : /-\s?\d+%|\d+\s?%/i.test(cleanSentence)
+        ? "Réduction"
+        : /gratuit|offert|1\s?acheté|1\s?achetée|2\s?pour\s?1/i.test(cleanSentence)
+          ? "Offert"
+          : /mardi|jeudi|coupe du monde|world cup/i.test(cleanSentence)
+            ? "Événement"
+            : "Bon plan",
+
+    badge_icon: /étudiant|student/i.test(cleanSentence)
+      ? "school"
+      : /mardi|jeudi|coupe du monde|world cup/i.test(cleanSentence)
+        ? "event"
+        : "local_fire_department",
+
+    category: /étudiant|student/i.test(cleanSentence)
+      ? "student"
+      : /soir|happy hour|night/i.test(cleanSentence)
+        ? "night"
+        : hasFinancialSignal(cleanSentence)
+          ? "flash"
+          : "new",
+
     city: source.city,
     source_url: source.url,
     source_id: source.id,
     source_type: source.type,
     food_types: source.food_types || [],
     status: "pending",
-    confidence_score: Math.min(100, 45 + scoreSentence(sentence, source) * 8),
+    confidence_score: Math.min(100, 45 + scoreSentence(cleanSentence, source) * 8),
     detected_at: now,
     last_seen_at: now,
   };
@@ -129,9 +167,9 @@ async function scanSource(source) {
       sentence,
       score: scoreSentence(sentence, source),
     }))
-    .filter((item) => item.score >= 4)
+    .filter((item) => item.score >= 8)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 5)
+    .slice(0, 2)
     .map((item) => buildOfferCandidate(item.sentence, source));
 }
 
