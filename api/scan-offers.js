@@ -3,6 +3,22 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const SCAN_SECRET = process.env.SCAN_SECRET;
 
 const USER_AGENT = "FastOffresBot/0.1 (+https://fastoffres.fr; Vercel scanner)";
+const MAX_SOURCES_PER_RUN = 3;
+const FETCH_TIMEOUT_MS = 8000;
+
+async function fetchWithTimeout(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 function stripHtml(html) {
   return html
@@ -93,7 +109,7 @@ async function loadSources() {
 }
 
 async function scanSource(source) {
-  const response = await fetch(source.url, {
+ const response = await fetchWithTimeout(source.url, {
     headers: {
       "user-agent": USER_AGENT,
       accept: "text/html,application/xhtml+xml",
@@ -151,9 +167,10 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const sources = await loadSources();
-    const offers = [];
-    const errors = [];
+    const allSources = await loadSources();
+const sources = allSources.slice(0, MAX_SOURCES_PER_RUN);
+const offers = [];
+const errors = [];
 
     for (const source of sources) {
       try {
@@ -172,6 +189,7 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({
       ok: true,
+      totalSourcesAvailable: allSources.length,
       scannedSources: sources.length,
       candidates: offers.length,
       inserted: inserted.length,
