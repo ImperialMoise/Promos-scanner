@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Admin — Promos Scanner</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      color: #191c1d;
+    }
+
+    header {
+      padding: 24px;
+      background: #ffffff;
+      border-bottom: 1px solid #e1e3e4;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+    }
+
+    .login,
+    .toolbar,
+    .card {
+      background: #ffffff;
+      border: 1px solid #e1e3e4;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 1px solid #c9c9c9;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-top: 8px;
+    }
+
+    button,
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .primary {
+      background: #a04100;
+      color: #ffffff;
+    }
+
+    .secondary {
+      background: #e2e0fc;
+      color: #1a1a2e;
+    }
+
+    .danger {
+      background: #ffdad6;
+      color: #93000a;
+    }
+
+    .muted {
+      color: #5a4136;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .pill {
+      background: #edeeef;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message {
+      margin: 16px 0;
+      padding: 12px;
+      border-radius: 8px;
+      background: #ffdbcc;
+      color: #7a3000;
+      font-weight: 700;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      background: #f3f4f5;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Admin Promos Scanner</h1>
+    <p class="muted">Validation manuelle des offres détectées automatiquement.</p>
+  </header>
+
+  <main>
+    <section class="login" id="loginBox">
+      <label for="secretInput">
+        Secret admin
+      </label>
+      <input id="secretInput" type="password" placeholder="Ex : fastoffres2026" />
+      <div class="actions">
+        <button class="primary" type="button" id="saveSecretButton">Entrer</button>
+      </div>
+      <p class="muted">
+        C’est la même valeur que ta variable Vercel SCAN_SECRET.
+      </p>
+    </section>
+
+    <section class="toolbar hidden" id="toolbar">
+      <button class="primary" type="button" id="refreshButton">Rafraîchir les offres</button>
+      <button class="secondary" type="button" id="forgetButton">Oublier le secret</button>
+      <a class="button secondary" href="/" target="_blank" rel="noopener noreferrer">Voir le site</a>
+    </section>
+
+    <div class="message hidden" id="message"></div>
+
+    <section class="grid" id="offersList"></section>
+  </main>
+
+  <script>
+    const secretInput = document.getElementById("secretInput");
+    const saveSecretButton = document.getElementById("saveSecretButton");
+    const refreshButton = document.getElementById("refreshButton");
+    const forgetButton = document.getElementById("forgetButton");
+    const loginBox = document.getElementById("loginBox");
+    const toolbar = document.getElementById("toolbar");
+    const message = document.getElementById("message");
+    const offersList = document.getElementById("offersList");
+
+    function getSecret() {
+      return localStorage.getItem("promosScannerAdminSecret") || "";
+    }
+
+    function setMessage(text) {
+      message.textContent = text;
+      message.classList.toggle("hidden", !text);
+    }
+
+    function showAdmin() {
+      loginBox.classList.add("hidden");
+      toolbar.classList.remove("hidden");
+    }
+
+    function showLogin() {
+      loginBox.classList.remove("hidden");
+      toolbar.classList.add("hidden");
+      offersList.innerHTML = "";
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function loadOffers() {
+      const secret = getSecret();
+
+      if (!secret) {
+        showLogin();
+        return;
+      }
+
+      showAdmin();
+      setMessage("Chargement des offres pending...");
+
+      const response = await fetch(`/api/admin-offers?secret=${encodeURIComponent(secret)}`);
+      const data = await response.json();
+
+      if (!data.ok) {
+        setMessage(data.error || "Impossible de charger les offres.");
+        return;
+      }
+
+      renderOffers(data.offers);
+      setMessage(`${data.offers.length} offre(s) en attente.`);
+    }
+
+    function renderOffers(offers) {
+      if (!offers.length) {
+        offersList.innerHTML = `
+          <article class="card">
+            <h2>Aucune offre en attente</h2>
+            <p class="muted">Relance le scanner pour détecter de nouvelles offres.</p>
+          </article>
+        `;
+        return;
+      }
+
+      offersList.innerHTML = offers.map((offer) => `
+        <article class="card">
+          <h2>${escapeHtml(offer.title)}</h2>
+
+          <div class="meta">
+            <span class="pill">${escapeHtml(offer.brand)}</span>
+            <span class="pill">${escapeHtml(offer.city || "Bordeaux")}</span>
+            <span class="pill">${escapeHtml(offer.category || "new")}</span>
+            <span class="pill">Score ${escapeHtml(offer.confidence_score)}</span>
+            <span class="pill">${escapeHtml(offer.price || "Prix à vérifier")}</span>
+          </div>
+
+          <p>${escapeHtml(offer.description || "Pas de description.")}</p>
+
+          <p class="muted">
+            Détectée le ${escapeHtml(new Date(offer.detected_at).toLocaleString("fr-FR"))}
+          </p>
+
+          <div class="actions">
+            <button class="primary" type="button" onclick="updateOffer(${offer.id}, 'publish')">
+              Publier
+            </button>
+
+            <button class="danger" type="button" onclick="updateOffer(${offer.id}, 'reject')">
+              Rejeter
+            </button>
+
+            ${
+              offer.source_url
+                ? `<a class="button secondary" href="${escapeHtml(offer.source_url)}" target="_blank" rel="noopener noreferrer">Ouvrir la source</a>`
+                : ""
+            }
+          </div>
+        </article>
+      `).join("");
+    }
+
+    async function updateOffer(id, action) {
+      const secret = getSecret();
+      const label = action === "publish" ? "publication" : "rejet";
+
+      setMessage(`${label} en cours...`);
+
+      const response = await fetch("/api/admin-update-offer", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          secret,
+          id,
+          action,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        setMessage(data.error || "Action impossible.");
+        return;
+      }
+
+      setMessage(action === "publish" ? "Offre publiée." : "Offre rejetée.");
+      await loadOffers();
+    }
+
+    saveSecretButton.addEventListener("click", async () => {
+      const secret = secretInput.value.trim();
+
+      if (!secret) {
+        setMessage("Entre ton secret admin.");
+        return;
+      }
+
+      localStorage.setItem("promosScannerAdminSecret", secret);
+      await loadOffers();
+    });
+
+    refreshButton.addEventListener("click", loadOffers);
+
+    forgetButton.addEventListener("click", () => {
+      localStorage.removeItem("promosScannerAdminSecret");
+      secretInput.value = "";
+      setMessage("Secret oublié.");
+      showLogin();
+    });
+
+    if (getSecret()) {
+      loadOffers();
+    }
+  </script>
+</body>
+</html>
