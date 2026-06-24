@@ -1,59 +1,4 @@
-const fallbackDeals = [
-  {
-    id: 1,
-    title: "Mardi Fou",
-    brand: "Domino's Pizza",
-    badge: "Flash",
-    badgeIcon: "schedule",
-    badgeClass: "bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary-fixed-dim",
-    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80",
-    oldPrice: "24.90€",
-    price: "7.99€",
-    distance: "1.2 km",
-    category: "flash",
-    city: "Bordeaux",
-  },
-  {
-    id: 2,
-    title: "Student Box",
-    brand: "KFC",
-    badge: "Étudiant",
-    badgeIcon: "school",
-    badgeClass: "bg-secondary text-on-secondary border border-secondary-fixed-dim",
-    image: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?auto=format&fit=crop&w=900&q=80",
-    price: "-50%",
-    distance: "0.8 km",
-    category: "student",
-    city: "Bordeaux",
-  },
-  {
-    id: 3,
-    title: "King Deal",
-    brand: "Burger King",
-    badge: "Soir",
-    badgeIcon: "dark_mode",
-    badgeClass: "bg-primary-container text-on-primary-container border border-primary",
-    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80",
-    oldPrice: "12.90€",
-    price: "8.90€",
-    distance: "1.6 km",
-    category: "night",
-    city: "Bordeaux",
-  },
-  {
-    id: 4,
-    title: "Nouveau Wrap",
-    brand: "FastFood Local",
-    badge: "Nouveau",
-    badgeIcon: "auto_awesome",
-    badgeClass: "bg-tertiary text-on-tertiary border border-tertiary",
-    image: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=900&q=80",
-    price: "6.50€",
-    distance: "2.1 km",
-    category: "new",
-    city: "Bordeaux",
-  },
-];
+const fallbackDeals = [];
 
 const categories = [
   {
@@ -241,11 +186,28 @@ function DealsSection({ dealsToShow, onSelect, onReset }) {
         </button>
       </div>
 
-      <div className="hide-scrollbar -mx-gutter flex gap-md overflow-x-auto px-gutter pb-sm md:mx-0 md:px-0">
-        {dealsToShow.map((deal) => (
-          <DealCard deal={deal} key={deal.id} onSelect={onSelect} />
-        ))}
-      </div>
+      {dealsToShow.length > 0 ? (
+  <div className="hide-scrollbar -mx-gutter flex gap-md overflow-x-auto px-gutter pb-sm md:mx-0 md:px-0">
+    {dealsToShow.map((deal) => (
+      <DealCard deal={deal} key={deal.id} onSelect={onSelect} />
+    ))}
+  </div>
+) : (
+  <div className="rounded-xl border border-surface-variant bg-surface-container-lowest p-md">
+    <h3 className="font-headline-sm text-headline-sm text-on-surface">
+      Aucune offre réelle publiée pour le moment
+    </h3>
+    <p className="mt-xs font-body-md text-body-md text-on-surface-variant">
+      Lance le scanner, corrige les offres dans l’admin, puis publie uniquement les bons plans confirmés.
+    </p>
+    <a
+      className="mt-sm inline-flex rounded bg-primary px-sm py-xs font-label-bold text-label-bold text-on-primary transition-colors hover:bg-surface-tint"
+      href="/admin.html"
+    >
+      Ouvrir l’admin
+    </a>
+  </div>
+)}
     </section>
   );
 }
@@ -309,7 +271,7 @@ function App() {
 
     if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase) {
       setDataMode("demo");
-      setMessage("Mode démo : les offres affichées sont des exemples. Ajoute tes clés Supabase dans index.html pour afficher uniquement les vraies offres validées.");
+      setMessage("Aucune connexion Supabase : impossible d'afficher les offres réelles pour le moment.");
       return;
     }
 
@@ -330,15 +292,15 @@ function App() {
           setDataMode("supabase");
           setMessage(`${data.length} offre(s) publiée(s) chargée(s) depuis Supabase.`);
         } else {
-          setDeals(fallbackDeals);
+          setDeals([]);
           setDataMode("empty");
-          setMessage("Aucune offre vérifiée pour l’instant");
+          setMessage("Aucune offre réelle publiée pour l’instant.");
         }
       })
       .catch((error) => {
-        setDeals(fallbackDeals);
+        setDeals([]);
         setDataMode("error");
-        setMessage(`Lecture Supabase impossible : ${error.message}. Les cartes de démo restent affichées.`);
+        setMessage(`Lecture Supabase impossible : ${error.message}. Aucune offre réelle ne peut être affichée.`);
       })
       .finally(() => setIsLoading(false));
   }, []);
@@ -370,7 +332,7 @@ function handleSelectDeal(deal) {
     return;
   }
 
-  setMessage(`Cette offre est un exemple de démo : aucune source officielle n'est liée pour l'instant.`);
+  setMessage("Aucune source officielle n'est liée à cette offre.");
 }
 
   return (
@@ -388,13 +350,13 @@ function handleSelectDeal(deal) {
         <div className="flex flex-wrap items-center gap-sm font-label-bold text-label-bold text-on-surface-variant">
           <span>Ville active : <span className="text-primary">{searchedCity}</span></span>
           <span className="rounded-full bg-surface-container px-sm py-xs text-label-sm uppercase tracking-wide">
-            Source : {dataMode === "supabase" ? "Supabase" : "Démo"}
+            Source : {dataMode === "supabase" ? "Supabase" : "Aucune offre réelle"}
           </span>
           {isLoading && <span className="text-primary">Chargement des offres...</span>}
         </div>
 
         <DealsSection dealsToShow={filteredDeals} onSelect={handleSelectDeal} onReset={handleReset} />
-        <CategoriesSection onPick={handlePickCategory} />
+        {deals.length > 0 && <CategoriesSection onPick={handlePickCategory} />}
       </main>
       <Footer />
     </div>

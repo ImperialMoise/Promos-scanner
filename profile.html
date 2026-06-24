@@ -270,44 +270,29 @@
     </section>
 
     <section class="flex flex-col gap-sm overflow-hidden">
-      <div class="flex items-end justify-between">
-        <h2 class="font-headline-sm text-headline-sm text-on-surface">Mes offres favorites</h2>
-        <a class="font-label-sm text-label-sm text-primary hover:underline" href="/#deals">
-          Voir tout
-        </a>
-      </div>
+  <div class="flex items-end justify-between">
+    <h2 class="font-headline-sm text-headline-sm text-on-surface">Mes offres favorites</h2>
+    <a class="font-label-sm text-label-sm text-primary hover:underline" href="/#deals">
+      Voir les offres
+    </a>
+  </div>
 
-      <div class="no-scrollbar flex gap-md overflow-x-auto pb-md">
-        <article class="relative min-w-[280px] overflow-hidden rounded-xl border border-surface-variant bg-surface-container-lowest">
-          <div class="absolute left-sm top-sm z-10 rounded bg-secondary px-sm py-xs font-label-sm text-label-sm text-on-secondary">
-            Étudiant
-          </div>
-          <div class="h-32 bg-surface-variant">
-            <img class="h-full w-full object-cover" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80" alt="Pizza" />
-          </div>
-          <div class="flex flex-col gap-xs p-sm">
-            <h3 class="font-label-bold text-label-bold text-on-surface">Domino’s Pizza</h3>
-            <p class="font-headline-md text-headline-md text-primary">1 achetée = 1 offerte</p>
-            <p class="font-label-sm text-label-sm text-on-surface-variant">Exemple de favori</p>
-          </div>
-        </article>
-
-        <article class="relative min-w-[280px] overflow-hidden rounded-xl border border-surface-variant bg-surface-container-lowest">
-          <div class="absolute left-sm top-sm z-10 flex items-center gap-xs rounded bg-tertiary-fixed px-sm py-xs font-label-sm text-label-sm text-on-tertiary-fixed">
-            <span class="material-symbols-outlined text-[14px]">schedule</span>
-            Flash
-          </div>
-          <div class="h-32 bg-surface-variant">
-            <img class="h-full w-full object-cover" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80" alt="Burger" />
-          </div>
-          <div class="flex flex-col gap-xs p-sm">
-            <h3 class="font-label-bold text-label-bold text-on-surface">Burger King</h3>
-            <p class="font-headline-md text-headline-md text-primary">Menu bon plan</p>
-            <p class="font-label-sm text-label-sm text-on-surface-variant">Exemple de favori</p>
-          </div>
-        </article>
+  <article class="rounded-xl border border-surface-variant bg-surface-container-lowest p-md">
+    <div class="flex items-center gap-sm">
+      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-surface-container text-primary">
+        <span class="material-symbols-outlined">favorite</span>
       </div>
-    </section>
+      <div>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface">
+          Aucun favori pour le moment
+        </h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">
+          Les favoris seront ajoutés plus tard quand les vraies offres publiées seront disponibles.
+        </p>
+      </div>
+    </div>
+  </article>
+</section>
 
     <section class="mt-md flex flex-col justify-end gap-sm border-t border-surface-variant pt-md sm:flex-row">
       <a class="rounded-lg border-2 border-primary-container px-lg py-sm text-center font-headline-sm text-headline-sm font-bold text-primary-container transition hover:bg-surface-container" href="/">
