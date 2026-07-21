@@ -59,13 +59,25 @@
     <main class="max-w-[1100px] mx-auto px-margin-mobile md:px-margin-desktop py-8 pb-32">
         
         <div id="tab-dashboard" class="tab-content active">
+            
             <section class="flex flex-col md:flex-row justify-between items-end mb-12 gap-8 border-b-4 border-ink-black pb-8 relative">
                 <div class="doodle-ivy" style="bottom: -15px; right: 20%;">~*~*~</div>
+                
                 <div class="flex-1 w-full relative">
                     <label class="font-label-md uppercase text-ink-black font-bold block mb-2 tracking-widest">Nom du personnage</label>
                     <div class="font-scrawl text-5xl md:text-6xl text-ink-black ink-dotted-bottom pb-2 w-full">
                         <input type="text" id="char-name" class="bg-transparent outline-none w-full" placeholder="Ton Nom...">
                     </div>
+                </div>
+
+                <div class="flex-1 w-full flex flex-col items-end">
+                    <label class="font-label-md uppercase text-ink-black font-bold block mb-4 text-right tracking-widest">Expérience (Dépensée / Totale)</label>
+                    <div class="flex gap-4 mb-4">
+                        <div class="stat-circle !w-12 !h-12 !text-xl"><input type="number" id="xp-spent" class="bg-transparent text-center w-full outline-none" min="0" value="0"></div>
+                        <div class="stat-circle !w-12 !h-12 !text-xl" style="transform: rotate(3deg);"><input type="number" id="xp-total" class="bg-transparent text-center w-full outline-none" min="0" value="0"></div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 justify-end w-64" id="xp-dots-container">
+                        </div>
                 </div>
             </section>
 
@@ -117,18 +129,21 @@
                         </div>
                         
                         <div class="border-t-2 border-ink-black pt-4 flex justify-between items-center">
-                            <span class="font-scrawl uppercase text-2xl">Élan</span>
-                            <input type="number" id="track-momentum" class="border-4 border-ink-black font-scrawl text-3xl text-center w-20 h-16 rounded" value="2" min="-6" max="10">
+                            <div>
+                                <span class="font-scrawl uppercase text-2xl block">Élan</span>
+                                <span id="momentum-limits-text" class="font-label-sm font-bold text-gray-600">Max: 10 / Réinit: 2</span>
+                            </div>
+                            <input type="number" id="track-momentum" data-reset="2" class="border-4 border-ink-black font-scrawl text-3xl text-center w-20 h-16 rounded" value="2" min="-6" max="10">
                         </div>
                     </div>
 
                     <div class="ink-border p-6 bg-white">
                         <h3 class="font-scrawl text-2xl uppercase mb-6 border-b-2 border-ink-black pb-2">Handicaps</h3>
                         <div class="grid grid-cols-2 gap-4">
-                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-wounded" class="hand-checkbox"/> Blessé</label>
-                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-shaken" class="hand-checkbox"/> Secoué</label>
-                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-unprepared" class="hand-checkbox"/> Mal préparé</label>
-                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-encumbered" class="hand-checkbox"/> Encombré</label>
+                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-wounded" class="hand-checkbox condition-check"/> Blessé</label>
+                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-shaken" class="hand-checkbox condition-check"/> Secoué</label>
+                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-unprepared" class="hand-checkbox condition-check"/> Mal préparé</label>
+                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-encumbered" class="hand-checkbox condition-check"/> Encombré</label>
                         </div>
                     </div>
                 </div>
@@ -165,7 +180,7 @@
                                 </div>
                             </div>
                             
-                            <h3 id="outcome-text" class="font-scrawl text-4xl mt-6 uppercase scribble-underline inline-block">Résultat</h3>
+                            <h3 id="outcome-text" class="font-scrawl text-3xl mt-6 uppercase scribble-underline inline-block">Résultat</h3>
                             
                             <button id="burn-momentum-btn" class="hidden w-full mt-6 border-2 border-ink-black font-scrawl text-xl py-2 rounded bg-paper-bg hover:bg-gray-200">Brûler l'élan !</button>
                         </div>
@@ -193,6 +208,8 @@
                     <button id="add-track-btn" class="border-2 border-ink-black bg-ink-black text-white font-scrawl text-xl px-4 py-2 rounded">Jurer</button>
                 </div>
                 
+                <div id="progress-roll-result" class="hidden mb-8 border-4 border-ink-black p-4 text-center bg-gray-100 rounded" style="transform: rotate(-1deg);"></div>
+
                 <div id="tracks-container"></div>
             </div>
         </div>

@@ -3,14 +3,12 @@ window.switchTab = function(tabId) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
 
-    // Reset styles
     document.querySelectorAll('.tab-btn-desk').forEach(btn => {
         btn.classList.remove('active-desk');
         btn.classList.add('text-graphite');
     });
     document.querySelectorAll('.tab-btn-mob').forEach(btn => btn.classList.remove('active-mob'));
 
-    // Apply active style based on event target
     const btn = event.currentTarget;
     if (btn.classList.contains('tab-btn-desk')) {
         btn.classList.add('active-desk');
@@ -20,19 +18,15 @@ window.switchTab = function(tabId) {
     }
 };
 
-// === 2. SAUVEGARDE ET CHARGEMENT (LocalStorage) ===
-const inputs = document.querySelectorAll('input[type="number"], input[type="text"], input[type="checkbox"], textarea');
-
+// === 2. SAUVEGARDE ET CHARGEMENT DE BASE ===
+const inputs = document.querySelectorAll('input[type="number"], input[type="text"], input[type="checkbox"]:not(.hand-checkbox.condition-check), textarea');
 inputs.forEach(input => {
     if (input.id) {
-        // Load
         const savedValue = localStorage.getItem(input.id);
         if (savedValue !== null) {
             if (input.type === 'checkbox') input.checked = savedValue === 'true';
             else input.value = savedValue;
         }
-        
-        // Save on change
         input.addEventListener('input', () => {
             if (input.type === 'checkbox') localStorage.setItem(input.id, input.checked);
             else localStorage.setItem(input.id, input.value);
@@ -40,7 +34,70 @@ inputs.forEach(input => {
     }
 });
 
-// === 3. MOTEUR DE DÉS ===
+// === 3. LOGIQUE DES HANDICAPS ET DE L'ÉLAN (MOMENTUM) ===
+const conditionChecks = document.querySelectorAll('.condition-check');
+const momentumInput = document.getElementById('track-momentum');
+const momentumLimitsText = document.getElementById('momentum-limits-text');
+
+function updateMomentumLimits() {
+    let activeDebilities = 0;
+    conditionChecks.forEach(check => {
+        if (check.checked) activeDebilities++;
+    });
+
+    // Règle d'Ironsworn : Max Élan = 10 - Handicaps
+    const maxMomentum = 10 - activeDebilities;
+    
+    // Règle d'Ironsworn : Réinitialisation = 2 (0 hand), 1 (1 hand), 0 (2+ hand)
+    let resetMomentum = 0;
+    if (activeDebilities === 0) resetMomentum = 2;
+    else if (activeDebilities === 1) resetMomentum = 1;
+
+    momentumInput.max = maxMomentum;
+    momentumInput.dataset.reset = resetMomentum;
+    momentumLimitsText.textContent = `Max: ${maxMomentum} / Réinit: ${resetMomentum}`;
+
+    // On baisse l'élan actuel s'il dépasse le nouveau max
+    if (parseInt(momentumInput.value) > maxMomentum) {
+        momentumInput.value = maxMomentum;
+        localStorage.setItem('track-momentum', maxMomentum);
+    }
+}
+
+// Initialisation et écoute des handicaps
+conditionChecks.forEach(check => {
+    const saved = localStorage.getItem(check.id);
+    if (saved !== null) check.checked = saved === 'true';
+    
+    check.addEventListener('change', () => {
+        localStorage.setItem(check.id, check.checked);
+        updateMomentumLimits();
+    });
+});
+updateMomentumLimits();
+
+
+// === 4. XP DOTS (BULLES D'EXPÉRIENCE) ===
+const xpContainer = document.getElementById('xp-dots-container');
+let savedXpDots = JSON.parse(localStorage.getItem('ironsworn-xp-dots')) || Array(15).fill(false);
+
+function renderXpDots() {
+    xpContainer.innerHTML = '';
+    savedXpDots.forEach((isFilled, index) => {
+        const dot = document.createElement('div');
+        dot.className = `exp-dot ${isFilled ? 'filled' : ''}`;
+        dot.addEventListener('click', () => {
+            savedXpDots[index] = !savedXpDots[index];
+            localStorage.setItem('ironsworn-xp-dots', JSON.stringify(savedXpDots));
+            renderXpDots();
+        });
+        xpContainer.appendChild(dot);
+    });
+}
+renderXpDots();
+
+
+// === 5. MOTEUR DE DÉS & BRÛLER L'ÉLAN ===
 const rollBtn = document.getElementById('roll-btn');
 const rollResult = document.getElementById('roll-result');
 const outcomeText = document.getElementById('outcome-text');
@@ -63,8 +120,7 @@ rollBtn.addEventListener('click', () => {
 
     evaluateResult(actionScore, c1, c2);
     
-    // Check momentum
-    const currentMomentum = parseInt(document.getElementById('track-momentum').value) || 0;
+    const currentMomentum = parseInt(momentumInput.value) || 0;
     if (currentMomentum > actionScore) burnBtn.classList.remove('hidden');
     else burnBtn.classList.add('hidden');
 
@@ -72,29 +128,32 @@ rollBtn.addEventListener('click', () => {
 });
 
 burnBtn.addEventListener('click', () => {
-    const currentMomentum = parseInt(document.getElementById('track-momentum').value) || 0;
+    const currentMomentum = parseInt(momentumInput.value) || 0;
     const c1 = parseInt(document.getElementById('challenge1').textContent);
     const c2 = parseInt(document.getElementById('challenge2').textContent);
 
     document.getElementById('action-total').textContent = currentMomentum;
     evaluateResult(currentMomentum, c1, c2);
 
-    const momentumInput = document.getElementById('track-momentum');
-    momentumInput.value = 2;
-    localStorage.setItem('track-momentum', 2);
+    // Réinitialisation intelligente (selon les handicaps)
+    const resetVal = parseInt(momentumInput.dataset.reset) || 2;
+    momentumInput.value = resetVal;
+    localStorage.setItem('track-momentum', resetVal);
+    
     burnBtn.classList.add('hidden');
 });
 
 function evaluateResult(score, c1, c2) {
     let outcome = "ÉCHEC";
-    if (score > c1 && score > c2) outcome = "COUP FORT";
+    if (score > c1 && score > c2) outcome = "COUP FORT !";
     else if (score > c1 || score > c2) outcome = "COUP FAIBLE";
     
     if (c1 === c2) outcome += " (DOUBLE !)";
     outcomeText.textContent = outcome;
 }
 
-// === 4. VŒUX & PROGRESSIONS ===
+
+// === 6. VŒUX, PROGRESSIONS ET JET DE PROGRÈS ===
 let tracks = JSON.parse(localStorage.getItem('ironsworn-tracks')) || [];
 const tracksContainer = document.getElementById('tracks-container');
 const addTrackBtn = document.getElementById('add-track-btn');
@@ -114,26 +173,29 @@ function renderTracks() {
             if (track.ticks >= (i + 1) * 4) boxTicks = 4;
             else if (track.ticks > i * 4) boxTicks = track.ticks % 4;
             
+            // Symboles dessinés à la main : barre (/), croix (X), étoile (*), case pleine
             let symbol = '';
-            if (boxTicks === 1) symbol = '-';
-            if (boxTicks === 2) symbol = '+';
+            let bgClass = 'bg-white';
+            if (boxTicks === 1) symbol = '/';
+            if (boxTicks === 2) symbol = 'X';
             if (boxTicks === 3) symbol = '*';
-            if (boxTicks === 4) symbol = 'X';
+            if (boxTicks === 4) bgClass = 'bg-ink-black';
             
-            boxesHtml += `<div class="progress-box bg-white">${symbol}</div>`;
+            boxesHtml += `<div class="progress-box ${bgClass}">${symbol}</div>`;
         }
 
         const card = document.createElement('div');
         card.className = 'mb-10 relative';
         card.innerHTML = `
             <div class="flex justify-between items-baseline mb-3">
-                <span class="font-scrawl text-xl">${track.name}</span>
+                <span class="font-scrawl text-2xl">${track.name}</span>
                 <span class="font-label-sm font-bold border-2 border-ink-black px-2 py-1 transform rotate-1">${diffLabels[track.diff]}</span>
             </div>
             <div class="flex gap-2 flex-wrap mb-4">${boxesHtml}</div>
             <div class="flex gap-4">
-                <button onclick="markProgress(${index})" class="border-2 border-ink-black font-scrawl px-3 py-1 rounded bg-white hover:bg-gray-100">+ Progrès</button>
-                <button onclick="deleteTrack(${index})" class="border-2 border-ink-black font-scrawl px-3 py-1 rounded bg-white text-red-700 hover:bg-gray-100">Supprimer</button>
+                <button onclick="markProgress(${index})" class="border-2 border-ink-black font-scrawl text-xl px-3 py-1 rounded bg-white hover:bg-gray-100">+ Progrès</button>
+                <button onclick="resolveProgress(${index})" class="border-2 border-ink-black font-scrawl text-xl px-3 py-1 rounded bg-ink-black text-white transform rotate-1 hover:scale-105">Jet de Progrès</button>
+                <button onclick="deleteTrack(${index})" class="border-2 border-ink-black font-scrawl text-xl px-3 py-1 rounded bg-white text-red-700 hover:bg-gray-100">Supprimer</button>
             </div>
         `;
         tracksContainer.appendChild(card);
@@ -156,11 +218,30 @@ window.markProgress = function(index) {
 };
 
 window.deleteTrack = function(index) {
-    if (confirm('Supprimer ce vœu ?')) { tracks.splice(index, 1); saveTracks(); }
+    if (confirm('Supprimer définitivement ce vœu ?')) { tracks.splice(index, 1); saveTracks(); }
+};
+
+window.resolveProgress = function(index) {
+    const track = tracks[index];
+    const progressScore = Math.floor(track.ticks / 4);
+    const c1 = Math.floor(Math.random() * 10) + 1;
+    const c2 = Math.floor(Math.random() * 10) + 1;
+    
+    let outcome = "ÉCHEC";
+    if (progressScore > c1 && progressScore > c2) outcome = "COUP FORT !";
+    else if (progressScore > c1 || progressScore > c2) outcome = "COUP FAIBLE";
+    if (c1 === c2) outcome += " (DOUBLE !)";
+
+    const resBox = document.getElementById('progress-roll-result');
+    resBox.innerHTML = `<h4 class="font-scrawl text-2xl uppercase mb-2">Jet pour "${track.name}"</h4>
+                        <p class="font-hand text-xl">Score de ${progressScore} VS [ ${c1} ] et [ ${c2} ]</p>
+                        <p class="font-scrawl text-3xl mt-2">${outcome}</p>`;
+    resBox.classList.remove('hidden');
 };
 renderTracks();
 
-// === 5. ATOUTS (CARTES) ===
+
+// === 7. ATOUTS (CARTES) ===
 let assets = JSON.parse(localStorage.getItem('ironsworn-assets')) || [];
 const assetsContainer = document.getElementById('assets-container');
 
@@ -207,7 +288,8 @@ document.getElementById('add-asset-btn').addEventListener('click', () => {
 window.deleteAsset = function(index) { if (confirm('Supprimer cet atout ?')) { assets.splice(index, 1); saveAssets(); renderAssets(); } };
 renderAssets();
 
-// === 6. ORACLE ===
+
+// === 8. ORACLE OUI/NON ===
 document.getElementById('oracle-yes-no-btn').addEventListener('click', () => {
     const roll = Math.floor(Math.random() * 100) + 1;
     let a = roll <= 25 ? "NON" : roll <= 50 ? "Non mitigé" : roll <= 85 ? "OUI" : "OUI ABSOLU !";
