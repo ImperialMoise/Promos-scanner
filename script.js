@@ -233,5 +233,83 @@ window.resolveProgress = function(index) {
     resDiv.classList.remove('hidden');
 };
 
-// Lancement automatique au chargement de la page
-renderTracks();
+// === 5. DECK D'ATOUTS ===
+let assets = JSON.parse(localStorage.getItem('ironsworn-assets')) || [];
+const assetsContainer = document.getElementById('assets-container');
+const addAssetBtn = document.getElementById('add-asset-btn');
+
+// Fonction qui lit l'écran et sauvegarde silencieusement en mémoire
+function saveAssets() {
+    const assetCards = document.querySelectorAll('.asset-card');
+    let updatedAssets = [];
+    
+    assetCards.forEach(card => {
+        updatedAssets.push({
+            title: card.querySelector('.asset-title').value,
+            ab1Text: card.querySelector('.ab1-text').value,
+            ab1Checked: card.querySelector('.ab1-check').checked,
+            ab2Text: card.querySelector('.ab2-text').value,
+            ab2Checked: card.querySelector('.ab2-check').checked,
+            ab3Text: card.querySelector('.ab3-text').value,
+            ab3Checked: card.querySelector('.ab3-check').checked
+        });
+    });
+    
+    localStorage.setItem('ironsworn-assets', JSON.stringify(updatedAssets));
+}
+
+// Fonction pour dessiner les cartes à l'écran
+function renderAssets() {
+    assetsContainer.innerHTML = '';
+    
+    assets.forEach((asset, index) => {
+        const card = document.createElement('div');
+        card.className = 'asset-card';
+        card.innerHTML = `
+            <div class="asset-header">
+                <input type="text" class="asset-title" placeholder="Nom de l'atout..." value="${asset.title || ''}">
+                <button class="btn-delete" onclick="deleteAsset(${index})" title="Supprimer cet atout">X</button>
+            </div>
+            <div class="asset-ability">
+                <input type="checkbox" class="ab1-check" ${asset.ab1Checked ? 'checked' : ''}>
+                <textarea class="ab1-text" placeholder="Première capacité...">${asset.ab1Text || ''}</textarea>
+            </div>
+            <div class="asset-ability">
+                <input type="checkbox" class="ab2-check" ${asset.ab2Checked ? 'checked' : ''}>
+                <textarea class="ab2-text" placeholder="Deuxième capacité...">${asset.ab2Text || ''}</textarea>
+            </div>
+            <div class="asset-ability">
+                <input type="checkbox" class="ab3-check" ${asset.ab3Checked ? 'checked' : ''}>
+                <textarea class="ab3-text" placeholder="Troisième capacité...">${asset.ab3Text || ''}</textarea>
+            </div>
+        `;
+        
+        // On écoute chaque modification (texte ou case cochée) pour déclencher la sauvegarde
+        card.querySelectorAll('input, textarea').forEach(el => {
+            el.addEventListener('input', saveAssets);
+            el.addEventListener('change', saveAssets);
+        });
+        
+        assetsContainer.appendChild(card);
+    });
+}
+
+// Bouton pour ajouter une carte vide
+addAssetBtn.addEventListener('click', () => {
+    assets.push({ title: '', ab1Text: '', ab1Checked: false, ab2Text: '', ab2Checked: false, ab3Text: '', ab3Checked: false });
+    renderAssets();
+    saveAssets();
+});
+
+// Bouton pour supprimer une carte
+window.deleteAsset = function(index) {
+    if (confirm('Voulez-vous vraiment supprimer cet atout de votre deck ?')) {
+        assets.splice(index, 1);
+        saveAssets();
+        renderAssets();
+    }
+};
+
+// Initialisation au lancement
+renderAssets();
+
