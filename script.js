@@ -1,4 +1,4 @@
-// === 1. NAVIGATION DES ONGLETS ===
+// === 1. NAVIGATION MULTI-ONGLETS MOBILE ===
 window.switchTab = function(tabId) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
@@ -18,23 +18,70 @@ window.switchTab = function(tabId) {
     }
 };
 
-// === 2. SAUVEGARDE ET CHARGEMENT DE BASE ===
-const inputs = document.querySelectorAll('input[type="number"], input[type="text"], input[type="checkbox"]:not(.hand-checkbox.condition-check), textarea');
-inputs.forEach(input => {
+// === 2. SAUVEGARDE ET CHARGEMENT AUTOMATIQUE ===
+const baseInputs = document.querySelectorAll('input[type="number"], input[type="text"], textarea:not(.asset-area)');
+baseInputs.forEach(input => {
     if (input.id) {
-        const savedValue = localStorage.getItem(input.id);
-        if (savedValue !== null) {
-            if (input.type === 'checkbox') input.checked = savedValue === 'true';
-            else input.value = savedValue;
-        }
-        input.addEventListener('input', () => {
-            if (input.type === 'checkbox') localStorage.setItem(input.id, input.checked);
-            else localStorage.setItem(input.id, input.value);
-        });
+        const saved = localStorage.getItem(input.id);
+        if (saved !== null) input.value = saved;
+        input.addEventListener('input', () => localStorage.setItem(input.id, input.value));
     }
 });
 
-// === 3. LOGIQUE DES HANDICAPS ET DE L'ÉLAN (MOMENTUM) ===
+// === 3. CALCULATEUR D'EXPÉRIENCE INTELLIGENT ===
+const xpDotsContainer = document.getElementById('xp-dots-container');
+const xpTotalDisplay = document.getElementById('xp-total-display');
+const xpSpentDisplay = document.getElementById('xp-spent-display');
+const btnSpendXp = document.getElementById('btn-spend-xp');
+const btnRefundXp = document.getElementById('btn-refund-xp');
+
+let xpData = JSON.parse(localStorage.getItem('ironsworn-xp-data')) || {
+    dots: Array(30).fill(false),
+    spent: 0
+};
+
+function updateXpCounters() {
+    let totalXp = xpData.dots.filter(d => d).length;
+    xpTotalDisplay.textContent = totalXp;
+    xpSpentDisplay.textContent = xpData.spent;
+    localStorage.setItem('ironsworn-xp-data', JSON.stringify(xpData));
+}
+
+function renderXpDots() {
+    xpDotsContainer.innerHTML = '';
+    xpData.dots.forEach((isFilled, index) => {
+        const dot = document.createElement('div');
+        dot.className = `exp-dot ${isFilled ? 'filled' : ''}`;
+        dot.addEventListener('click', () => {
+            xpData.dots[index] = !xpData.dots[index];
+            updateXpCounters();
+            renderXpDots();
+        });
+        xpDotsContainer.appendChild(dot);
+    });
+}
+
+btnSpendXp.addEventListener('click', () => {
+    let totalXp = xpData.dots.filter(d => d).length;
+    if (totalXp - xpData.spent >= 2) {
+        xpData.spent += 2;
+        updateXpCounters();
+    } else {
+        alert("Pas assez d'XP disponible ! Marquez d'abord des bulles d'expérience.");
+    }
+});
+
+btnRefundXp.addEventListener('click', () => {
+    if (xpData.spent >= 2) {
+        xpData.spent -= 2;
+        updateXpCounters();
+    }
+});
+
+renderXpDots();
+updateXpCounters();
+
+// === 4. COMPORTEMENT DE L'ÉLAN & LIMITES PAR LES HANDICAPS ===
 const conditionChecks = document.querySelectorAll('.condition-check');
 const momentumInput = document.getElementById('track-momentum');
 const momentumLimitsText = document.getElementById('momentum-limits-text');
@@ -45,30 +92,24 @@ function updateMomentumLimits() {
         if (check.checked) activeDebilities++;
     });
 
-    // Règle d'Ironsworn : Max Élan = 10 - Handicaps
     const maxMomentum = 10 - activeDebilities;
-    
-    // Règle d'Ironsworn : Réinitialisation = 2 (0 hand), 1 (1 hand), 0 (2+ hand)
-    let resetMomentum = 0;
-    if (activeDebilities === 0) resetMomentum = 2;
-    else if (activeDebilities === 1) resetMomentum = 1;
+    let resetMomentum = 2;
+    if (activeDebilities === 1) resetMomentum = 1;
+    else if (activeDebilities > 1) resetMomentum = 0;
 
     momentumInput.max = maxMomentum;
     momentumInput.dataset.reset = resetMomentum;
     momentumLimitsText.textContent = `Max: ${maxMomentum} / Réinit: ${resetMomentum}`;
 
-    // On baisse l'élan actuel s'il dépasse le nouveau max
     if (parseInt(momentumInput.value) > maxMomentum) {
         momentumInput.value = maxMomentum;
         localStorage.setItem('track-momentum', maxMomentum);
     }
 }
 
-// Initialisation et écoute des handicaps
 conditionChecks.forEach(check => {
     const saved = localStorage.getItem(check.id);
     if (saved !== null) check.checked = saved === 'true';
-    
     check.addEventListener('change', () => {
         localStorage.setItem(check.id, check.checked);
         updateMomentumLimits();
@@ -76,28 +117,7 @@ conditionChecks.forEach(check => {
 });
 updateMomentumLimits();
 
-
-// === 4. XP DOTS (BULLES D'EXPÉRIENCE) ===
-const xpContainer = document.getElementById('xp-dots-container');
-let savedXpDots = JSON.parse(localStorage.getItem('ironsworn-xp-dots')) || Array(15).fill(false);
-
-function renderXpDots() {
-    xpContainer.innerHTML = '';
-    savedXpDots.forEach((isFilled, index) => {
-        const dot = document.createElement('div');
-        dot.className = `exp-dot ${isFilled ? 'filled' : ''}`;
-        dot.addEventListener('click', () => {
-            savedXpDots[index] = !savedXpDots[index];
-            localStorage.setItem('ironsworn-xp-dots', JSON.stringify(savedXpDots));
-            renderXpDots();
-        });
-        xpContainer.appendChild(dot);
-    });
-}
-renderXpDots();
-
-
-// === 5. MOTEUR DE DÉS & BRÛLER L'ÉLAN ===
+// === 5. RESOLUTION DES JET D'ACTION ===
 const rollBtn = document.getElementById('roll-btn');
 const rollResult = document.getElementById('roll-result');
 const outcomeText = document.getElementById('outcome-text');
@@ -135,11 +155,9 @@ burnBtn.addEventListener('click', () => {
     document.getElementById('action-total').textContent = currentMomentum;
     evaluateResult(currentMomentum, c1, c2);
 
-    // Réinitialisation intelligente (selon les handicaps)
     const resetVal = parseInt(momentumInput.dataset.reset) || 2;
     momentumInput.value = resetVal;
     localStorage.setItem('track-momentum', resetVal);
-    
     burnBtn.classList.add('hidden');
 });
 
@@ -147,78 +165,78 @@ function evaluateResult(score, c1, c2) {
     let outcome = "ÉCHEC";
     if (score > c1 && score > c2) outcome = "COUP FORT !";
     else if (score > c1 || score > c2) outcome = "COUP FAIBLE";
-    
     if (c1 === c2) outcome += " (DOUBLE !)";
     outcomeText.textContent = outcome;
 }
 
-
-// === 6. VŒUX, PROGRESSIONS ET JET DE PROGRÈS ===
+// === 6. QUÊTES & PROGRESSIONS (AVEC JAUGE DE LIENS UNIQUE) ===
 let tracks = JSON.parse(localStorage.getItem('ironsworn-tracks')) || [];
+let bondTicks = parseInt(localStorage.getItem('ironsworn-bond-ticks')) || 0;
 const tracksContainer = document.getElementById('tracks-container');
+const bondsContainer = document.getElementById('bonds-track-container');
 const addTrackBtn = document.getElementById('add-track-btn');
 const diffLabels = { troublesome: 'Pénible', dangerous: 'Dangereux', formidable: 'Redoutable', extreme: 'Extrême', epic: 'Épique' };
 
-function saveTracks() {
-    localStorage.setItem('ironsworn-tracks', JSON.stringify(tracks));
-    renderTracks();
+function buildBoxesHtml(ticks) {
+    let html = '';
+    for (let i = 0; i < 10; i++) {
+        let boxTicks = 0;
+        if (ticks >= (i + 1) * 4) boxTicks = 4;
+        else if (ticks > i * 4) boxTicks = ticks % 4;
+        
+        let symbol = '';
+        let bgClass = 'bg-white';
+        if (boxTicks === 1) symbol = '/';
+        if (boxTicks === 2) symbol = 'X';
+        if (boxTicks === 3) symbol = '*';
+        if (boxTicks === 4) bgClass = 'bg-ink-black';
+        
+        html += `<div class="progress-box ${bgClass}">${symbol}</div>`;
+    }
+    return html;
 }
 
 function renderTracks() {
+    // 1. Dessiner la jauge fixe des Liens
+    bondsContainer.innerHTML = buildBoxesHtml(bondTicks);
+
+    // 2. Dessiner les quêtes dynamiques
     tracksContainer.innerHTML = '';
     tracks.forEach((track, index) => {
-        let boxesHtml = '';
-        for (let i = 0; i < 10; i++) {
-            let boxTicks = 0;
-            if (track.ticks >= (i + 1) * 4) boxTicks = 4;
-            else if (track.ticks > i * 4) boxTicks = track.ticks % 4;
-            
-            // Symboles dessinés à la main : barre (/), croix (X), étoile (*), case pleine
-            let symbol = '';
-            let bgClass = 'bg-white';
-            if (boxTicks === 1) symbol = '/';
-            if (boxTicks === 2) symbol = 'X';
-            if (boxTicks === 3) symbol = '*';
-            if (boxTicks === 4) bgClass = 'bg-ink-black';
-            
-            boxesHtml += `<div class="progress-box ${bgClass}">${symbol}</div>`;
-        }
-
         const card = document.createElement('div');
-        card.className = 'mb-10 relative';
+        card.className = 'border-2 border-ink-black p-4 rounded bg-white relative';
         card.innerHTML = `
-            <div class="flex justify-between items-baseline mb-3">
-                <span class="font-scrawl text-2xl">${track.name}</span>
-                <span class="font-label-sm font-bold border-2 border-ink-black px-2 py-1 transform rotate-1">${diffLabels[track.diff]}</span>
+            <div class="flex justify-between items-baseline mb-2">
+                <span class="font-scrawl text-xl">${track.name}</span>
+                <span class="font-label-sm font-bold border border-ink-black px-1.5 text-xs transform rotate-1">${diffLabels[track.diff]}</span>
             </div>
-            <div class="flex gap-2 flex-wrap mb-4">${boxesHtml}</div>
-            <div class="flex gap-4">
-                <button onclick="markProgress(${index})" class="border-2 border-ink-black font-scrawl text-xl px-3 py-1 rounded bg-white hover:bg-gray-100">+ Progrès</button>
-                <button onclick="resolveProgress(${index})" class="border-2 border-ink-black font-scrawl text-xl px-3 py-1 rounded bg-ink-black text-white transform rotate-1 hover:scale-105">Jet de Progrès</button>
-                <button onclick="deleteTrack(${index})" class="border-2 border-ink-black font-scrawl text-xl px-3 py-1 rounded bg-white text-red-700 hover:bg-gray-100">Supprimer</button>
+            <div class="flex gap-1 flex-wrap mb-3">${buildBoxesHtml(track.ticks)}</div>
+            <div class="flex gap-2">
+                <button onclick="markProgress(${index})" class="border border-ink-black font-scrawl text-sm px-2.5 py-1 rounded bg-white">+ Progrès</button>
+                <button onclick="resolveProgress(${index})" class="border border-ink-black bg-ink-black text-white font-scrawl text-sm px-2.5 py-1 rounded">Résoudre</button>
+                <button onclick="deleteTrack(${index})" class="text-red-700 font-scrawl text-sm ml-auto">Suppr.</button>
             </div>
         `;
         tracksContainer.appendChild(card);
     });
 }
 
-addTrackBtn.addEventListener('click', () => {
-    const nameInput = document.getElementById('new-track-name');
-    if (!nameInput.value.trim()) return;
-    tracks.push({ name: nameInput.value.trim(), diff: document.getElementById('new-track-difficulty').value, ticks: 0 });
-    nameInput.value = '';
-    saveTracks();
-});
-
 window.markProgress = function(index) {
-    const track = tracks[index];
-    let amount = { troublesome: 12, dangerous: 8, formidable: 4, extreme: 2, epic: 1 }[track.diff];
-    track.ticks = Math.min(40, track.ticks + amount);
-    saveTracks();
+    if (index === -1) {
+        // Ajouter un progrès aux liens (1 coche par défaut)
+        bondTicks = Math.min(40, bondTicks + 1);
+        localStorage.setItem('ironsworn-bond-ticks', bondTicks);
+    } else {
+        const track = tracks[index];
+        let amount = { troublesome: 12, dangerous: 8, formidable: 4, extreme: 2, epic: 1 }[track.diff];
+        track.ticks = Math.min(40, track.ticks + amount);
+        localStorage.setItem('ironsworn-tracks', JSON.stringify(tracks));
+    }
+    renderTracks();
 };
 
 window.deleteTrack = function(index) {
-    if (confirm('Supprimer définitivement ce vœu ?')) { tracks.splice(index, 1); saveTracks(); }
+    if (confirm('Supprimer cette quête ?')) { tracks.splice(index, 1); localStorage.setItem('ironsworn-tracks', JSON.stringify(tracks)); renderTracks(); }
 };
 
 window.resolveProgress = function(index) {
@@ -233,15 +251,23 @@ window.resolveProgress = function(index) {
     if (c1 === c2) outcome += " (DOUBLE !)";
 
     const resBox = document.getElementById('progress-roll-result');
-    resBox.innerHTML = `<h4 class="font-scrawl text-2xl uppercase mb-2">Jet pour "${track.name}"</h4>
-                        <p class="font-hand text-xl">Score de ${progressScore} VS [ ${c1} ] et [ ${c2} ]</p>
-                        <p class="font-scrawl text-3xl mt-2">${outcome}</p>`;
+    resBox.innerHTML = `<p class="font-hand text-lg">Jet pour "${track.name}" : Score ${progressScore} VS [${c1}] & [${c2}]</p>
+                        <p class="text-2xl uppercase mt-1">${outcome}</p>`;
     resBox.classList.remove('hidden');
 };
+
+addTrackBtn.addEventListener('click', () => {
+    const nameInput = document.getElementById('new-track-name');
+    if (!nameInput.value.trim()) return;
+    tracks.push({ name: nameInput.value.trim(), diff: document.getElementById('new-track-difficulty').value, ticks: 0 });
+    nameInput.value = '';
+    localStorage.setItem('ironsworn-tracks', JSON.stringify(tracks));
+    renderTracks();
+});
+
 renderTracks();
 
-
-// === 7. ATOUTS (CARTES) ===
+// === 7. DECK D'ATOUTS DYNAMIQUE ===
 let assets = JSON.parse(localStorage.getItem('ironsworn-assets')) || [];
 const assetsContainer = document.getElementById('assets-container');
 
@@ -265,14 +291,14 @@ function renderAssets() {
         const card = document.createElement('div');
         card.className = 'ink-border p-4 bg-white asset-card';
         card.innerHTML = `
-            <div class="flex justify-between mb-4">
-                <input type="text" class="a-title font-scrawl text-2xl outline-none border-b-2 border-ink-black w-3/4" placeholder="Nom de l'Atout..." value="${asset.title || ''}">
-                <button onclick="deleteAsset(${index})" class="font-scrawl text-red-700">X</button>
+            <div class="flex justify-between items-center mb-3">
+                <input type="text" class="a-title font-scrawl text-xl outline-none border-b-2 border-ink-black w-3/4" placeholder="Nom de l'Atout..." value="${asset.title || ''}">
+                <button onclick="deleteAsset(${index})" class="font-scrawl text-red-700 text-sm">X</button>
             </div>
             ${[1, 2, 3].map(i => `
-                <div class="flex gap-3 mb-3 items-start">
+                <div class="flex gap-2.5 mb-2 items-start">
                     <input type="checkbox" class="a-c${i} hand-checkbox mt-1" ${asset['c'+i] ? 'checked' : ''}>
-                    <textarea class="a-t${i} font-hand text-xl w-full outline-none border-b border-dashed border-gray-400 bg-transparent resize-none" rows="2">${asset['t'+i] || ''}</textarea>
+                    <textarea class="a-t${i} asset-area font-hand text-xl w-full outline-none border-b border-dashed border-gray-400 bg-transparent resize-none h-12">${asset['t'+i] || ''}</textarea>
                 </div>
             `).join('')}
         `;
@@ -288,12 +314,28 @@ document.getElementById('add-asset-btn').addEventListener('click', () => {
 window.deleteAsset = function(index) { if (confirm('Supprimer cet atout ?')) { assets.splice(index, 1); saveAssets(); renderAssets(); } };
 renderAssets();
 
+// === 8. AIDE-MÉMOIRE DES RÈGLES & ORACLE ===
+const rulesSelector = document.getElementById('rules-selector');
+const rulesDisplayBox = document.getElementById('rules-display-box');
 
-// === 8. ORACLE OUI/NON ===
+const movesDatabase = {
+    danger: "<strong>Faire Face au Danger :</strong> Quand vous tentez quelque chose de risqué, décrivez votre approche et lancez 1d6 + votre caractéristique appropriée. <br>• <i>Coup Fort :</i> Vous réussissez. Prenez +1 élan.<br>• <i>Coup Faible :</i> Vous réussissez, mais vous devez payer un prix (Subissez -1 Santé, Esprit ou Provisions).<br>• <i>Échec :</i> Le danger se concrétise. Payez le Prix.",
+    avantage: "<strong>Sécuriser un Avantage :</strong> Vous préparez le terrain. Lancez +Carac.<br>• <i>Coup Fort :</i> Prenez l'avantage ! Prenez +2 Élan ou ajoutez +1 au prochain jet.<br>• <i>Coup Faible :</i> Succès mineur. Prenez +1 Élan.",
+    infos: "<strong>Récolter des Informations :</strong> Vous fouillez un lieu ou questionnez un PNJ. Lancez +Astuce.<br>• <i>Coup Fort :</i> Vous découvrez une vérité utile. Prenez +2 Élan.<br>• <i>Coup Faible :</i> Information partielle, mais le chemin se complique. Prenez +1 Élan.",
+    frapper: "<strong>Frapper :</strong> Attaque offensive en combat. Lancez +Fer (mêlée) ou +Vivacité (distance).<br>• <i>Coup Fort :</i> Infligez vos dégâts (généralement 2) et conservez l'initiative.<br>• <i>Coup Faible :</i> Infligez vos dégâts, mais vous perdez l'initiative.",
+    opposer: "<strong>S'opposer :</strong> Vous parez une attaque ennemie. Lancez +Fer ou +Vivacité.<br>• <i>Coup Fort :</i> Vous esquivez/parez. Prenez l'initiative ou +2 Élan.<br>• <i>Coup Faible :</i> Vous évitez le pire mais perdez l'initiative. Payez le Prix.",
+    voeu: "<strong>Jurer un Vœu de Fer :</strong> Vous lancez une quête sacrée. Lancez +Cœur.<br>• <i>Coup Fort :</i> Vous êtes béni. Prenez +2 Élan.<br>• <i>Coup Faible :</i> Vous commencez, mais un doute ou un obstacle se dresse. Prenez +1 Élan.<br>• <i>Échec :</i> Un obstacle majeur se dresse avant même le départ."
+};
+
+rulesSelector.addEventListener('change', () => {
+    rulesDisplayBox.innerHTML = movesDatabase[rulesSelector.value];
+});
+rulesDisplayBox.innerHTML = movesDatabase.danger; // Affichage initial
+
 document.getElementById('oracle-yes-no-btn').addEventListener('click', () => {
     const roll = Math.floor(Math.random() * 100) + 1;
-    let a = roll <= 25 ? "NON" : roll <= 50 ? "Non mitigé" : roll <= 85 ? "OUI" : "OUI ABSOLU !";
+    let a = roll <= 25 ? "NON" : roll <= 50 ? "Peut-être pas (Non mitigé)" : roll <= 85 ? "OUI" : "OUI ABSOLU ! (Excellente nouvelle)";
     const res = document.getElementById('oracle-res');
-    res.textContent = `${roll} : ${a}`;
+    res.innerHTML = `Résultat d100 : <span class="text-red-800">${roll}</span><br>➔ <span class="underline">${a}</span>`;
     res.classList.remove('hidden');
 });

@@ -1,92 +1,74 @@
-/* Esquisse Expressive Styles */
+/* Style Carnet de Croquis */
 .paper-texture { background-color: #ffffff; }
 
-/* High contrast hand-drawn borders */
 .ink-border {
     border: 3px solid #000000;
     border-radius: 2px 8px 3px 6px / 6px 2px 7px 3px;
-    box-shadow: 4px 4px 0px 0px #000000; 
+    box-shadow: 3px 3px 0px 0px #000000; 
     position: relative;
     background: #ffffff;
-    margin-bottom: 8px;
 }
 
 .ink-dotted-bottom { border-bottom: 3px dashed #000000; }
-
-/* Fonts */
 .font-scrawl { font-family: 'Permanent Marker', cursive; }
 .font-hand { font-family: 'Caveat', cursive; }
 
-/* Custom checkbox (Handicaps/Atouts) */
+/* Custom Checkbox Dessinée */
 .hand-checkbox {
-    appearance: none; width: 24px; height: 24px;
+    appearance: none; width: 22px; height: 22px;
     border: 2px solid #000000; border-radius: 2px 4px 2px 4px / 4px 2px 4px 2px;
     background-color: transparent; cursor: pointer;
     display: grid; place-content: center; position: relative;
 }
 .hand-checkbox::before {
-    content: "X"; font-family: 'Permanent Marker', cursive; font-size: 24px;
+    content: "X"; font-family: 'Permanent Marker', cursive; font-size: 22px;
     line-height: 1; color: #000000;
-    transform: scale(0) rotate(-10deg); transition: 120ms transform ease-in-out;
-    position: absolute; top: -2px; left: 3px;
+    transform: scale(0) rotate(-10deg); transition: 100ms transform ease-in-out;
+    position: absolute; top: -3px; left: 2px;
 }
 .hand-checkbox:checked::before { transform: scale(1) rotate(-10deg); }
 
-/* Experience dots */
+/* Bulles d'XP */
 .exp-dot {
-    width: 16px; height: 16px;
-    border: 2px solid #000;
+    width: 15px; height: 15px; border: 2px solid #000;
     border-radius: 50% 40% 60% 45% / 45% 55% 40% 50%;
-    display: inline-block; cursor: pointer;
+    display: inline-block; cursor: pointer; transition: background-color 0.1s;
 }
 .exp-dot.filled {
-    background-color: #000;
-    box-shadow: inset 1px 1px 0px #333;
+    background-color: #000; box-shadow: inset 1px 1px 0px #333;
 }
 
-/* Stat circle */
+/* Cercles des Caractéristiques */
 .stat-circle {
-    width: 64px; height: 64px;
+    width: 52px; height: 52px;
     border: 3px solid #000000; border-radius: 4px 8px 3px 6px / 6px 3px 7px 4px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 32px; font-family: 'Permanent Marker', cursive;
+    font-size: 26px; font-family: 'Permanent Marker', cursive;
     background: #ffffff; box-shadow: 2px 2px 0px #000; position: relative;
-    transform: rotate(-2deg);
+    transform: rotate(-1.5deg);
 }
-.stat-circle input[type="number"] {
-    -moz-appearance: textfield;
-}
-.stat-circle input::-webkit-outer-spin-button, .stat-circle input::-webkit-inner-spin-button {
-    -webkit-appearance: none; margin: 0;
-}
+.stat-circle input[type="number"] { -moz-appearance: textfield; }
+.stat-circle input::-webkit-outer-spin-button, .stat-circle input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-/* Progress track (Vows) */
+/* Cases des Barres de Progression */
 .progress-box {
-    width: 34px; height: 34px;
+    width: 32px; height: 32px;
     border: 2px solid #000000; border-radius: 3px 5px 2px 4px / 5px 2px 6px 3px;
     display: inline-flex; align-items: center; justify-content: center;
-    margin-right: 4px; position: relative; box-shadow: 2px 2px 0px #000;
-    font-family: 'Permanent Marker', cursive; font-size: 1.4rem; color: #000;
+    position: relative; box-shadow: 2px 2px 0px #000;
+    font-family: 'Permanent Marker', cursive; font-size: 1.3rem; color: #000;
 }
 
-/* Doodles */
-.doodle-ivy { position: absolute; font-family: 'Caveat', cursive; font-size: 24px; color: #000; pointer-events: none; opacity: 0.8; transform: rotate(15deg); }
-.doodle-raven { position: absolute; top: -20px; right: 10px; font-family: 'Material Symbols Outlined'; font-size: 32px; color: #000; transform: scaleX(-1); pointer-events: none; }
-
+.doodle-ivy { position: absolute; font-family: 'Caveat', cursive; font-size: 20px; color: #000; pointer-events: none; opacity: 0.6; }
+.doodle-raven { position: absolute; top: -16px; right: 8px; font-family: 'Material Symbols Outlined'; font-size: 26px; color: #000; transform: scaleX(-1); pointer-events: none; }
 .scribble-underline { position: relative; }
 .scribble-underline::after {
-    content: ''; position: absolute; bottom: -5px; left: 0; width: 100%; height: 4px;
-    border-top: 2px solid #000; border-bottom: 1px solid #000; border-radius: 50%; transform: rotate(-1deg);
+    content: ''; position: absolute; bottom: -3px; left: 0; width: 100%; height: 3px;
+    border-top: 2px solid #000; border-bottom: 1px solid #000; border-radius: 50%; transform: rotate(-0.5deg);
 }
 
-/* Tabs Logic */
+/* Onglets */
 .tab-content { display: none; }
 .tab-content.active { display: block; }
-
-/* Nav buttons active states */
-.active-desk {
-    background-color: #000 !important; color: #fff !important; border-color: #000 !important;
-}
-.active-mob {
-    background-color: #000 !important; color: #fff !important; border-radius: 8px; transform: rotate(-2deg);
-}
+.active-desk { background-color: #000 !important; color: #fff !important; border-color: #000 !important; }
+.active-mob { background-color: #000 !important; color: #fff !important; border-radius: 6px; transform: rotate(-3deg); }
