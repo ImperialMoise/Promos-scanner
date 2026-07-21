@@ -1,162 +1,249 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html class="light" lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ironsworn Companion</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Ironsworn Character Sheet</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Permanent+Marker&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="style.css">
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "ink-black": "#000000",
+                        "paper-bg": "#ffffff",
+                        "graphite": "#333333",
+                    },
+                    spacing: {
+                        "margin-mobile": "20px",
+                        "container-max": "1100px",
+                        "margin-desktop": "64px"
+                    },
+                    fontFamily: {
+                        "label-md": ["Courier Prime"],
+                        "label-sm": ["Courier Prime"],
+                        "headline-lg": ["'Permanent Marker'", "cursive"],
+                        "headline-lg-mobile": ["'Permanent Marker'", "cursive"]
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <header>
-        <h1>Ironsworn</h1>
-        <input type="text" id="char-name" placeholder="Nom du Personnage" />
+<body class="paper-texture text-ink-black min-h-screen">
+
+    <header class="hidden md:flex items-center justify-between px-margin-desktop h-20 w-full border-b-4 border-ink-black bg-paper-bg sticky top-0 z-40">
+        <div class="flex items-center gap-4 relative">
+            <h1 class="font-headline-lg uppercase tracking-tighter text-ink-black text-4xl scribble-underline">IRONSWORN</h1>
+            <div class="doodle-ivy" style="top: 40px; left: 200px;">~ ☘ ~</div>
+        </div>
+        <nav class="flex gap-8">
+            <button class="tab-btn-desk text-ink-black font-bold uppercase font-label-md border-2 border-ink-black px-3 py-1 rounded active-desk" onclick="switchTab('tab-dashboard')" style="transform: rotate(1deg);">Dashboard</button>
+            <button class="tab-btn-desk text-graphite hover:text-ink-black uppercase font-label-md transition-colors" onclick="switchTab('tab-journal')">Journal</button>
+            <button class="tab-btn-desk text-graphite hover:text-ink-black uppercase font-label-md transition-colors" onclick="switchTab('tab-moves')">Atouts</button>
+            <button class="tab-btn-desk text-graphite hover:text-ink-black uppercase font-label-md transition-colors" onclick="switchTab('tab-oracle')">Oracle</button>
+        </nav>
     </header>
 
-    <div class="tabs-nav">
-        <button class="tab-btn active" onclick="switchTab('character-tab')">Fiche de Personnage</button>
-        <button class="tab-btn" onclick="switchTab('help-tab')">Aide-Mémoire & Oracles</button>
-    </div>
+    <header class="flex md:hidden items-center justify-center px-margin-mobile h-16 w-full border-b-4 border-ink-black bg-paper-bg sticky top-0 z-40">
+        <h1 class="font-headline-lg-mobile uppercase tracking-tighter text-ink-black scribble-underline text-2xl">IRONSWORN</h1>
+    </header>
 
-    <main>
-        <div id="character-tab" class="tab-content active">
-            
-            <section id="stats-section">
-                <h2>Caractéristiques</h2>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <label>Vivacité</label>
-                        <input type="number" id="stat-edge" value="1" min="1" max="4">
-                    </div>
-                    <div class="stat-box">
-                        <label>Cœur</label>
-                        <input type="number" id="stat-heart" value="1" min="1" max="4">
-                    </div>
-                    <div class="stat-box">
-                        <label>Fer</label>
-                        <input type="number" id="stat-iron" value="1" min="1" max="4">
-                    </div>
-                    <div class="stat-box">
-                        <label>Astuce</label>
-                        <input type="number" id="stat-wits" value="1" min="1" max="4">
-                    </div>
-                    <div class="stat-box">
-                        <label>Ombre</label>
-                        <input type="number" id="stat-shadow" value="1" min="1" max="4">
+    <main class="max-w-[1100px] mx-auto px-margin-mobile md:px-margin-desktop py-8 pb-32">
+        
+        <div id="tab-dashboard" class="tab-content active">
+            <section class="flex flex-col md:flex-row justify-between items-end mb-12 gap-8 border-b-4 border-ink-black pb-8 relative">
+                <div class="doodle-ivy" style="bottom: -15px; right: 20%;">~*~*~</div>
+                <div class="flex-1 w-full relative">
+                    <label class="font-label-md uppercase text-ink-black font-bold block mb-2 tracking-widest">Nom du personnage</label>
+                    <div class="font-scrawl text-5xl md:text-6xl text-ink-black ink-dotted-bottom pb-2 w-full">
+                        <input type="text" id="char-name" class="bg-transparent outline-none w-full" placeholder="Ton Nom...">
                     </div>
                 </div>
             </section>
 
-            <section id="tracks-section">
-                <h2>Jauges</h2>
-                <div class="tracks-grid">
-                    <div class="track-box">
-                        <label>Santé</label>
-                        <input type="number" id="track-health" value="5" min="0" max="5">
+            <section class="mb-12">
+                <div class="text-center mb-8 relative">
+                    <h2 class="font-label-md uppercase text-ink-black font-bold text-xl inline-block px-4 py-2 border-2 border-ink-black" style="transform: rotate(-1deg); box-shadow: 2px 2px 0 0 #000;">Caractéristiques</h2>
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 md:gap-16">
+                    <div class="flex flex-col items-center">
+                        <div class="stat-circle mb-4" style="transform: rotate(-4deg);"><input type="number" id="stat-edge" class="bg-transparent text-center w-full outline-none" min="1" max="4" value="1"></div>
+                        <span class="font-scrawl uppercase text-xl">Vivacité</span>
                     </div>
-                    <div class="track-box">
-                        <label>Esprit</label>
-                        <input type="number" id="track-spirit" value="5" min="0" max="5">
+                    <div class="flex flex-col items-center">
+                        <div class="stat-circle mb-4" style="transform: rotate(2deg);"><input type="number" id="stat-heart" class="bg-transparent text-center w-full outline-none" min="1" max="4" value="1"></div>
+                        <span class="font-scrawl uppercase text-xl">Cœur</span>
                     </div>
-                    <div class="track-box">
-                        <label>Provisions</label>
-                        <input type="number" id="track-supply" value="5" min="0" max="5">
+                    <div class="flex flex-col items-center">
+                        <div class="stat-circle mb-4" style="transform: rotate(-1deg); border-width: 4px;"><input type="number" id="stat-iron" class="bg-transparent text-center w-full outline-none font-bold" min="1" max="4" value="1"></div>
+                        <span class="font-scrawl uppercase text-xl font-bold">Fer</span>
                     </div>
-                    <div class="track-box momentum">
-                        <label>Élan</label>
-                        <input type="number" id="track-momentum" value="2" min="-6" max="10">
+                    <div class="flex flex-col items-center">
+                        <div class="stat-circle mb-4" style="transform: rotate(5deg);"><input type="number" id="stat-shadow" class="bg-transparent text-center w-full outline-none" min="1" max="4" value="1"></div>
+                        <span class="font-scrawl uppercase text-xl">Ombre</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="stat-circle mb-4" style="transform: rotate(-3deg);"><input type="number" id="stat-wits" class="bg-transparent text-center w-full outline-none" min="1" max="4" value="1"></div>
+                        <span class="font-scrawl uppercase text-xl">Astuce</span>
                     </div>
                 </div>
             </section>
 
-            <section id="dice-section">
-                <h2>Moteur de Résolution</h2>
-                <div class="roll-controls">
-                    <select id="stat-selector">
-                        <option value="edge">Vivacité</option>
-                        <option value="heart">Cœur</option>
-                        <option value="iron">Fer</option>
-                        <option value="wits">Astuce</option>
-                        <option value="shadow">Ombre</option>
-                    </select>
-                    <input type="number" id="modifier" value="0" title="Ajouts éventuels (+1, +2...)" style="width: 40px;">
-                    <button id="roll-btn">Lancer l'Action</button>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                
+                <div class="lg:col-span-6 flex flex-col gap-8">
+                    <div class="ink-border p-6 bg-white">
+                        <div class="doodle-raven">flutter_dash</div>
+                        <h3 class="font-scrawl text-2xl uppercase mb-6 border-b-2 border-ink-black pb-2">Jauges</h3>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="font-scrawl uppercase text-xl">Santé</span>
+                            <input type="number" id="track-health" class="border-2 border-ink-black font-scrawl text-2xl text-center w-16 h-12 rounded" value="5" min="0" max="5">
+                        </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="font-scrawl uppercase text-xl">Esprit</span>
+                            <input type="number" id="track-spirit" class="border-2 border-ink-black font-scrawl text-2xl text-center w-16 h-12 rounded" value="5" min="0" max="5">
+                        </div>
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="font-scrawl uppercase text-xl">Provisions</span>
+                            <input type="number" id="track-supply" class="border-2 border-ink-black font-scrawl text-2xl text-center w-16 h-12 rounded" value="5" min="0" max="5">
+                        </div>
+                        
+                        <div class="border-t-2 border-ink-black pt-4 flex justify-between items-center">
+                            <span class="font-scrawl uppercase text-2xl">Élan</span>
+                            <input type="number" id="track-momentum" class="border-4 border-ink-black font-scrawl text-3xl text-center w-20 h-16 rounded" value="2" min="-6" max="10">
+                        </div>
+                    </div>
+
+                    <div class="ink-border p-6 bg-white">
+                        <h3 class="font-scrawl text-2xl uppercase mb-6 border-b-2 border-ink-black pb-2">Handicaps</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-wounded" class="hand-checkbox"/> Blessé</label>
+                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-shaken" class="hand-checkbox"/> Secoué</label>
+                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-unprepared" class="hand-checkbox"/> Mal préparé</label>
+                            <label class="flex items-center gap-3 font-hand text-2xl cursor-pointer"><input type="checkbox" id="cond-encumbered" class="hand-checkbox"/> Encombré</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6">
+                    <div class="ink-border p-6 bg-white min-h-full" style="transform: rotate(0.5deg);">
+                        <h3 class="font-scrawl text-3xl uppercase mb-6 border-b-2 border-ink-black pb-2 text-center">Les Dés</h3>
+                        
+                        <div class="flex flex-col gap-4 mb-6">
+                            <select id="stat-selector" class="border-2 border-ink-black p-2 font-hand text-2xl rounded outline-none bg-white">
+                                <option value="edge">Vivacité</option>
+                                <option value="heart">Cœur</option>
+                                <option value="iron">Fer</option>
+                                <option value="wits">Astuce</option>
+                                <option value="shadow">Ombre</option>
+                            </select>
+                            <div class="flex gap-4 items-center">
+                                <span class="font-hand text-2xl">Modificateur :</span>
+                                <input type="number" id="modifier" value="0" class="border-2 border-ink-black font-scrawl text-xl text-center w-16 h-10 rounded">
+                            </div>
+                            <button id="roll-btn" class="mt-4 border-4 border-ink-black bg-ink-black text-white font-scrawl text-2xl py-3 rounded transform hover:scale-105 transition-transform" style="box-shadow: 4px 4px 0px 0px #333;">Lancer l'action</button>
+                        </div>
+
+                        <div id="roll-result" class="hidden border-t-4 border-dashed border-ink-black pt-6 text-center">
+                            <div class="flex justify-center items-center gap-6 mb-4">
+                                <div class="text-center">
+                                    <div class="stat-circle !w-16 !h-16 mx-auto mb-1"><span id="action-total" class="text-3xl font-bold">0</span></div>
+                                    <span class="font-label-sm font-bold">Action</span>
+                                </div>
+                                <span class="font-scrawl text-2xl">VS</span>
+                                <div class="flex gap-3">
+                                    <div class="stat-circle !w-12 !h-12 !border-red-800 !text-red-800"><span id="challenge1">0</span></div>
+                                    <div class="stat-circle !w-12 !h-12 !border-red-800 !text-red-800"><span id="challenge2">0</span></div>
+                                </div>
+                            </div>
+                            
+                            <h3 id="outcome-text" class="font-scrawl text-4xl mt-6 uppercase scribble-underline inline-block">Résultat</h3>
+                            
+                            <button id="burn-momentum-btn" class="hidden w-full mt-6 border-2 border-ink-black font-scrawl text-xl py-2 rounded bg-paper-bg hover:bg-gray-200">Brûler l'élan !</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-journal" class="tab-content hidden">
+            <div class="ink-border p-6 bg-white min-h-[400px]">
+                <div class="flex justify-between items-end border-b-4 border-ink-black pb-2 mb-8 relative">
+                    <h3 class="font-scrawl text-3xl uppercase">Vœux & Progressions</h3>
+                    <div class="doodle-ivy" style="top: 0; right: 30%;">~*~</div>
                 </div>
                 
-                <div id="roll-result" class="hidden">
-                    <div class="dice-display">
-                        <div class="action-die-box">
-                            <span id="action-die-val">0</span> (d6) + <span id="stat-val">0</span> (carac+ajout) = <strong id="action-total">0</strong>
-                        </div>
-                        <div class="vs">CONTRE</div>
-                        <div class="challenge-dice-box">
-                            <span class="challenge-die" id="challenge1">0</span>
-                            <span class="challenge-die" id="challenge2">0</span>
-                        </div>
-                    </div>
-                    <h3 id="outcome-text">Résultat</h3>
-                    <button id="burn-momentum-btn" class="hidden">Brûler l'Élan !</button>
-                </div>
-            </section>
-
-            <section id="progress-section">
-                <h2>Vœux & Progressions</h2>
-                <div class="progress-controls">
-                    <input type="text" id="new-track-name" placeholder="Nom du Vœu, Périple ou Combat..." style="flex: 1;">
-                    <select id="new-track-difficulty">
-                        <option value="troublesome">Pénible (+3 cases)</option>
-                        <option value="dangerous">Dangereux (+2 cases)</option>
-                        <option value="formidable">Redoutable (+1 case)</option>
-                        <option value="extreme">Extrême (+2 coches)</option>
-                        <option value="epic">Épique (+1 coche)</option>
+                <div class="flex flex-col md:flex-row gap-4 mb-8">
+                    <input type="text" id="new-track-name" class="flex-1 border-2 border-ink-black font-hand text-2xl p-2 rounded" placeholder="Nouvelle quête...">
+                    <select id="new-track-difficulty" class="border-2 border-ink-black font-hand text-xl p-2 rounded bg-white">
+                        <option value="troublesome">Pénible</option>
+                        <option value="dangerous">Dangereux</option>
+                        <option value="formidable">Redoutable</option>
+                        <option value="extreme">Extrême</option>
+                        <option value="epic">Épique</option>
                     </select>
-                    <button id="add-track-btn">Ajouter</button>
+                    <button id="add-track-btn" class="border-2 border-ink-black bg-ink-black text-white font-scrawl text-xl px-4 py-2 rounded">Jurer</button>
                 </div>
+                
                 <div id="tracks-container"></div>
-            </section>
-
-            <section id="assets-section">
-                <div class="assets-header-container">
-                    <h2>Deck d'Atouts</h2>
-                    <button id="add-asset-btn">+ Nouvel Atout</button>
-                </div>
-                <div id="assets-container" class="assets-grid"></div>
-            </section>
-
+            </div>
         </div>
 
-        <div id="help-tab" class="tab-content">
-            <section class="help-section">
-                <h2>Les Actions Courantes (Quand lancer les dés ?)</h2>
-                <div class="help-card">
-                    <strong>Faire Face au Danger</strong>
-                    <p>Action universelle quand tu tentes quelque chose de risqué ou que tu évites une menace. Lance +caractéristique selon ton approche (Vivacité pour la vitesse, Fer pour la force, Astuce pour la ruse, Coeur pour le courage, Ombre pour la discrétion).</p>
-                </div>
-                <div class="help-card">
-                    <strong>Sécuriser un Avantage</strong>
-                    <p>Tu te prépares, tu observes ou tu tentes de prendre le dessus avant d'agir. En cas de succès, tu gagnes de l'Élan ou un bonus sur ton prochain jet.</p>
-                </div>
-                <div class="help-card">
-                    <strong>Récolter des Informations</strong>
-                    <p>Tu fouilles un lieu, tu questionnes un PNJ ou tu suis une piste. S'effectue généralement avec l'Astuce.</p>
-                </div>
-                <div class="help-card">
-                    <strong>Frapper</strong>
-                    <p>Tu attaques au corps-à-corps (Fer) ou à distance (Vivacité) et tu as l'avantage. Si tu réussis, tu infliges des dégâts (progrès).</p>
-                </div>
-                <div class="help-card">
-                    <strong>S'opposer</strong>
-                    <p>Tu es sur la défensive dans un combat et tu réponds à une attaque. Lance +Fer (corps-à-corps) ou +Vivacité (tir/esquive).</p>
-                </div>
-            </section>
-
-            <section class="help-section">
-                <h2>L'Oracle de Base (Générateur d'idées)</h2>
-                <p>Une question fermée sur le monde ? "Le PNJ est-il amical ?", "La porte est-elle verrouillée ?"<br>Mets le modificateur de dés à 0 et clique ci-dessous pour simuler un jet de d100 (deux d10) :</p>
-                <button id="oracle-yes-no-btn" style="background-color: #2196F3; color:white; border:none; padding:10px; border-radius:4px; cursor:pointer; font-weight:bold; width: 100%; margin-top: 10px;">Consulter l'Oracle (Oui/Non)</button>
-                <div id="oracle-res" class="hidden" style="margin-top:15px; background-color:#1e1e24; padding:15px; border-radius:4px; font-weight:bold; color:#ff9800; text-align: center; font-size: 1.1rem;"></div>
-            </section>
+        <div id="tab-moves" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-headline-lg text-3xl">Deck d'Atouts</h2>
+                <button id="add-asset-btn" class="border-2 border-ink-black font-scrawl text-xl px-4 py-2 rounded bg-white" style="box-shadow: 2px 2px 0 0 #000;">+ Nouvelle Carte</button>
+            </div>
+            <div id="assets-container" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
         </div>
+
+        <div id="tab-oracle" class="tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="ink-border p-6 bg-white" style="transform: rotate(-1deg);">
+                    <h3 class="font-scrawl text-3xl uppercase mb-4 border-b-2 border-ink-black pb-2">Actions</h3>
+                    <p class="font-hand text-xl mb-2"><strong>Face au Danger:</strong> Agir malgré la menace (+Carac).</p>
+                    <p class="font-hand text-xl mb-2"><strong>Frapper:</strong> Attaquer avec l'avantage (+Fer ou +Vivacité).</p>
+                    <p class="font-hand text-xl mb-2"><strong>S'opposer:</strong> Se défendre (+Fer ou +Vivacité).</p>
+                    <p class="font-hand text-xl mb-2"><strong>Sécuriser un Avantage:</strong> Se préparer (+Carac). Donne de l'Élan.</p>
+                </div>
+
+                <div class="ink-border p-6 bg-white" style="transform: rotate(1deg);">
+                    <h3 class="font-scrawl text-3xl uppercase mb-4 border-b-2 border-ink-black pb-2">L'Oracle (Oui/Non)</h3>
+                    <p class="font-hand text-xl mb-4">Pose une question à l'univers et lance les dés.</p>
+                    <button id="oracle-yes-no-btn" class="w-full border-2 border-ink-black bg-ink-black text-white font-scrawl text-2xl py-3 rounded mb-4" style="box-shadow: 3px 3px 0 0 #333;">Consulter le Destin</button>
+                    <div id="oracle-res" class="hidden text-center font-scrawl text-2xl border-t-2 border-dashed border-ink-black pt-4"></div>
+                </div>
+            </div>
+        </div>
+
     </main>
+
+    <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-paper-bg border-t-4 border-ink-black flex justify-around items-center h-20 px-margin-mobile pb-safe">
+        <button class="tab-btn-mob flex flex-col items-center justify-center p-1 w-16 h-16 active-mob" onclick="switchTab('tab-dashboard')">
+            <span class="material-symbols-outlined mb-1">grid_view</span>
+            <span class="font-scrawl uppercase text-[10px]">Dashboard</span>
+        </button>
+        <button class="tab-btn-mob flex flex-col items-center justify-center text-ink-black p-1 w-16 h-16 transition-colors" onclick="switchTab('tab-journal')">
+            <span class="material-symbols-outlined mb-1">auto_stories</span>
+            <span class="font-scrawl uppercase text-[10px]">Journal</span>
+        </button>
+        <button class="tab-btn-mob flex flex-col items-center justify-center text-ink-black p-1 w-16 h-16 transition-colors transform rotate-1" onclick="switchTab('tab-moves')">
+            <span class="material-symbols-outlined mb-1">swords</span>
+            <span class="font-scrawl uppercase text-[10px]">Atouts</span>
+        </button>
+        <button class="tab-btn-mob flex flex-col items-center justify-center text-ink-black p-1 w-16 h-16 transition-colors" onclick="switchTab('tab-oracle')">
+            <span class="material-symbols-outlined mb-1">auto_awesome</span>
+            <span class="font-scrawl uppercase text-[10px]">Oracle</span>
+        </button>
+    </nav>
 
     <script src="script.js"></script>
 </body>

@@ -1,338 +1,80 @@
-/* === FONDATIONS & RESET === */
-* {
-    box-sizing: border-box;
+/* Esquisse Expressive Styles */
+.paper-texture { background-color: #ffffff; }
+
+/* High contrast hand-drawn borders */
+.ink-border {
+    border: 3px solid #000000;
+    border-radius: 2px 8px 3px 6px / 6px 2px 7px 3px;
+    box-shadow: 4px 4px 0px 0px #000000; 
+    position: relative;
+    background: #ffffff;
+    margin-bottom: 8px;
 }
 
-body {
-    background-color: #121216; /* Un fond plus sombre pour faire ressortir les cartes */
-    color: #f5f5f5;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 15px 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+.ink-dotted-bottom { border-bottom: 3px dashed #000000; }
 
-/* === EN-TÊTE === */
-header {
-    width: 100%;
-    max-width: 600px;
-    text-align: center;
-    margin-bottom: 15px;
-}
+/* Fonts */
+.font-scrawl { font-family: 'Permanent Marker', cursive; }
+.font-hand { font-family: 'Caveat', cursive; }
 
-h1 {
-    margin: 0 0 5px 0;
-    font-size: 1.8rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #ffffff;
+/* Custom checkbox */
+.hand-checkbox {
+    appearance: none; width: 24px; height: 24px;
+    border: 2px solid #000000; border-radius: 2px 4px 2px 4px / 4px 2px 4px 2px;
+    background-color: transparent; cursor: pointer;
+    display: grid; place-content: center; position: relative;
 }
-
-#char-name {
-    width: 100%;
-    max-width: 300px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #3e3e4f;
-    border-radius: 8px;
-    color: white;
-    font-size: 1.2rem;
-    text-align: center;
-    padding: 10px;
+.hand-checkbox::before {
+    content: "X"; font-family: 'Permanent Marker', cursive; font-size: 24px;
+    line-height: 1; color: #000000;
+    transform: scale(0) rotate(-10deg); transition: 120ms transform ease-in-out;
+    position: absolute; top: -2px; left: 3px;
 }
+.hand-checkbox:checked::before { transform: scale(1) rotate(-10deg); }
 
-#char-name:focus {
-    outline: none;
-    border-color: #a8a8b3;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-/* === ONGLETS === */
-.tabs-nav {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    width: 100%;
-    max-width: 600px;
-}
-
-.tab-btn {
-    flex: 1;
-    padding: 12px 5px;
-    background-color: #1e1e24;
-    color: #a8a8b3;
-    border: 1px solid #3e3e4f;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-}
-
-.tab-btn.active {
-    background-color: #4a4a59;
-    color: white;
-    border-color: #717182;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.tab-content {
-    display: none;
-    width: 100%;
-    max-width: 600px;
-    flex-direction: column;
-    gap: 20px; /* Espace régulier entre chaque carte */
-}
-
-.tab-content.active {
-    display: flex;
-}
-
-/* === MISE EN PAGE EN CARTES (Sections) === */
-section {
-    background-color: #1e1e24;
-    padding: 20px 15px;
-    border-radius: 12px;
-    border: 1px solid #2b2b36;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-    width: 100%;
-}
-
-h2 {
-    text-align: center;
-    font-size: 1.1rem;
-    color: #a8a8b3;
-    margin-top: 0;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 1px solid #3e3e4f;
-    padding-bottom: 8px;
-}
-
-/* === CARACTÉRISTIQUES (Ligne fluide) === */
-.stats-grid {
-    display: flex;
-    gap: 8px;
-    justify-content: space-between;
-    flex-wrap: nowrap; /* Tente de tout garder sur une ligne */
-}
-
-.stat-box {
-    background-color: #2b2b36;
-    padding: 10px 5px;
-    border-radius: 8px;
-    text-align: center;
-    flex: 1;
-    min-width: 0; /* Empêche de déborder sur les petits écrans */
-}
-
-.stat-box label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    color: #a8a8b3;
-}
-
-.stat-box input {
-    width: 100%;
-    max-width: 45px;
-    font-size: 1.3rem;
-    text-align: center;
-    background-color: #121216;
-    color: white;
-    border: 1px solid #3e3e4f;
-    border-radius: 4px;
-    padding: 4px 0;
-}
-
-/* === JAUGES (Grille 2x2) === */
-.tracks-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-}
-
-.track-box {
-    background-color: #2b2b36;
-    padding: 12px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.track-box label {
-    font-weight: bold;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    color: #a8a8b3;
-    margin: 0;
-}
-
-.track-box input {
-    width: 50px;
-    font-size: 1.4rem;
-    text-align: center;
-    background-color: #121216;
-    color: white;
-    border: 1px solid #3e3e4f;
-    border-radius: 6px;
-    padding: 4px;
-}
-
-.track-box.momentum {
-    border: 1px solid #4CAF50;
-    background-color: rgba(76, 175, 80, 0.05);
-}
-
-.track-box.momentum input {
-    border-color: #4CAF50;
-}
-
-/* === MOTEUR DE DÉS === */
-.roll-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.roll-controls select, .roll-controls input, .roll-controls button {
-    padding: 12px;
-    background-color: #2b2b36;
-    color: white;
-    border: 1px solid #5a5a66;
-    border-radius: 8px;
-    font-size: 1rem;
-}
-
-.roll-controls select { flex: 2 1 120px; }
-.roll-controls input { flex: 1 1 60px; text-align: center; }
-#roll-btn {
-    flex: 1 1 100%;
-    background-color: #4a4a59;
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-}
-#roll-btn:hover { background-color: #5a5a66; }
-
-.dice-display {
-    background-color: #121216;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.challenge-dice-box { display: flex; gap: 15px; }
-.challenge-die {
-    background-color: #8b0000;
-    color: white;
-    padding: 10px;
-    border-radius: 6px;
-    font-weight: bold;
-    width: 40px;
-    text-align: center;
-    border: 2px solid #ff4c4c;
-    font-size: 1.2rem;
-}
-
-.vs { font-size: 0.9rem; color: #a8a8b3; font-style: italic; }
-.hidden { display: none !important; }
-
-#burn-momentum-btn {
-    width: 100%;
-    margin-top: 10px;
-    background-color: #ff9800;
-    color: #1e1e24;
-    font-weight: bold;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    text-transform: uppercase;
-    font-size: 1rem;
-}
-
-/* === PROGRESSIONS === */
-.progress-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.progress-controls input, .progress-controls select, .progress-controls button {
-    padding: 12px;
-    background-color: #2b2b36;
-    color: white;
-    border: 1px solid #5a5a66;
-    border-radius: 8px;
-}
-.progress-controls input { flex: 1 1 100%; }
-.progress-controls select { flex: 2 1 120px; }
-#add-track-btn { flex: 1 1 80px; font-weight: bold; background-color: #4a4a59; cursor: pointer; }
-
-.track-card {
-    background-color: #121216;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    border-left: 4px solid #a8a8b3;
-}
-
-.track-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-.track-title { font-weight: bold; margin: 0; font-size: 1.05rem; }
-.track-diff { font-size: 0.75rem; text-transform: uppercase; color: #ff9800; background-color: #2b2b36; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
-
-.boxes-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-bottom: 15px;
-    justify-content: center;
-}
-.progress-box {
-    width: 26px; height: 26px; border: 1px solid #5a5a66; background-color: #2b2b36;
+/* Stat circle */
+.stat-circle {
+    width: 64px; height: 64px;
+    border: 3px solid #000000; border-radius: 4px 8px 3px 6px / 6px 3px 7px 4px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 0.8rem; font-weight: bold; color: #4CAF50; border-radius: 4px;
+    font-size: 32px; font-family: 'Permanent Marker', cursive;
+    background: #ffffff; box-shadow: 2px 2px 0px #000; position: relative;
+    transform: rotate(-2deg);
 }
-.progress-box.filled { background-color: #1e1e24; border-color: #4CAF50; }
+.stat-circle input[type="number"] {
+    -moz-appearance: textfield;
+}
+.stat-circle input::-webkit-outer-spin-button, .stat-circle input::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+}
 
-.track-actions { display: flex; gap: 8px; }
-.track-actions button { flex: 1; padding: 10px; font-size: 0.85rem; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: bold; }
-.btn-mark { background-color: #4CAF50; }
-.btn-resolve { background-color: #2196F3; }
-.btn-delete { background-color: #F44336; flex: 0 0 auto !important; padding: 10px 15px !important; }
+/* Progress track (Vows) */
+.progress-box {
+    width: 36px; height: 36px;
+    border: 2px solid #000000; border-radius: 3px 5px 2px 4px / 5px 2px 6px 3px;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-right: 4px; position: relative; box-shadow: 2px 2px 0px #000;
+    font-family: 'Permanent Marker', cursive; font-size: 1.2rem;
+}
 
-.track-result-box { margin-top: 12px; padding: 10px; background-color: #2b2b36; border-radius: 6px; text-align: center; }
+/* Doodles */
+.doodle-ivy { position: absolute; font-family: 'Caveat', cursive; font-size: 24px; color: #000; pointer-events: none; opacity: 0.8; transform: rotate(15deg); }
+.doodle-raven { position: absolute; top: -20px; right: 10px; font-family: 'Material Symbols Outlined'; font-size: 32px; color: #000; transform: scaleX(-1); pointer-events: none; }
 
-/* === ATOUTS === */
-.assets-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-#add-asset-btn { background-color: #4CAF50; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+.scribble-underline { position: relative; }
+.scribble-underline::after {
+    content: ''; position: absolute; bottom: -5px; left: 0; width: 100%; height: 4px;
+    border-top: 2px solid #000; border-bottom: 1px solid #000; border-radius: 50%; transform: rotate(-1deg);
+}
 
-.assets-grid { display: flex; flex-direction: column; gap: 15px; }
-.asset-card { background-color: #121216; border: 1px solid #3e3e4f; border-radius: 8px; padding: 15px; }
-.asset-header { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
-.asset-title { flex: 1; background: transparent; border: none; border-bottom: 2px solid #5a5a66; color: white; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; }
-.asset-ability { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
-.asset-ability input[type="checkbox"] { margin-top: 5px; transform: scale(1.4); }
-.asset-ability textarea { flex: 1; background-color: #1e1e24; color: #f5f5f5; border: 1px solid #3e3e4f; border-radius: 6px; padding: 10px; resize: vertical; min-height: 60px; font-family: inherit; font-size: 0.95rem; }
+/* Tabs Logic */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
-/* === AIDE MEMOIRE === */
-.help-card { background-color: #121216; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #ff9800; }
-.help-card strong { color: #ff9800; display: block; margin-bottom: 5px; font-size: 1.05rem; }
-.help-card p { margin: 0; font-size: 0.95rem; color: #f5f5f5; line-height: 1.5; }
+/* Nav buttons active states */
+.active-desk {
+    background-color: #000 !important; color: #fff !important; border-color: #000 !important;
+}
+.active-mob {
+    background-color: #000 !important; color: #fff !important; border-radius: 8px; transform: rotate(-2deg);
+}
