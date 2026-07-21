@@ -1,6 +1,6 @@
 // === 1. NAVIGATION MOBILE ===
 window.switchTab = function(tabId) {
-    if (window.innerWidth >= 1024) return; // Désactivé sur PC (lg)
+    if (window.innerWidth >= 1024) return; 
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
     document.querySelectorAll('.tab-btn-mob').forEach(btn => btn.classList.remove('active-mob'));
@@ -17,7 +17,7 @@ baseInputs.forEach(input => {
     }
 });
 
-// === 3. JAUGES VITALES CLIQUABLES (SANTÉ, ESPRIT, PROVISIONS, ÉLAN) ===
+// === 3. NOUVEAU DESIGN DES JAUGES CONNECTÉES ===
 function initVitalTracks() {
     const vitals = [
         { id: 'track-health', min: 0, max: 5, reverse: true },
@@ -29,8 +29,6 @@ function initVitalTracks() {
     vitals.forEach(v => {
         const container = document.getElementById(v.id + '-container');
         const input = document.getElementById(v.id);
-        
-        // Charger la valeur sauvegardée
         const saved = localStorage.getItem(v.id);
         if (saved !== null) input.value = saved;
 
@@ -40,13 +38,11 @@ function initVitalTracks() {
             const start = v.reverse ? v.max : v.min;
             const end = v.reverse ? v.min : v.max;
             const step = v.reverse ? -1 : 1;
-
-            // Construction conditionnelle pour respecter le sens de la boucle
             const condition = (i) => v.reverse ? i >= end : i <= end;
 
             for (let i = start; condition(i); i += step) {
                 const box = document.createElement('div');
-                box.className = `vital-box ${i === currentVal ? 'bg-ink-black text-white transform scale-110' : 'bg-white text-ink-black'}`;
+                box.className = `vital-box ${i === currentVal ? 'active-val' : 'bg-white text-ink-black'}`;
                 box.textContent = (i > 0 && v.id === 'track-momentum') ? '+'+i : i;
                 
                 box.addEventListener('click', () => {
@@ -57,15 +53,13 @@ function initVitalTracks() {
                 container.appendChild(box);
             }
         }
-        
         render();
-        // Écouter les changements via le code (ex: quand on brûle l'élan)
         input.addEventListener('change', render);
     });
 }
 initVitalTracks();
 
-// === 4. COMPORTEMENT DE L'ÉLAN (MOMENTUM) ET HANDICAPS ===
+// === 4. ÉLAN & HANDICAPS ===
 const conditionChecks = document.querySelectorAll('.condition-check');
 const momentumInput = document.getElementById('track-momentum');
 const momentumLimitsText = document.getElementById('momentum-limits-text');
@@ -86,7 +80,7 @@ function updateMomentumLimits() {
     if (parseInt(momentumInput.value) > maxMomentum) {
         momentumInput.value = maxMomentum;
         localStorage.setItem('track-momentum', maxMomentum);
-        momentumInput.dispatchEvent(new Event('change')); // Met à jour le visuel
+        momentumInput.dispatchEvent(new Event('change'));
     }
 }
 
@@ -100,7 +94,7 @@ conditionChecks.forEach(check => {
 });
 updateMomentumLimits();
 
-// === 5. CALCULATEUR D'EXPÉRIENCE ===
+// === 5. XP ===
 let xpData = JSON.parse(localStorage.getItem('ironsworn-xp-data')) || { dots: Array(30).fill(false), spent: 0 };
 const xpTotalDisplay = document.getElementById('xp-total-display');
 const xpSpentDisplay = document.getElementById('xp-spent-display');
@@ -132,7 +126,7 @@ function renderXpDots(containerId) {
 document.querySelectorAll('.btn-spend-xp').forEach(btn => btn.addEventListener('click', () => {
     let totalXp = xpData.dots.filter(d => d).length;
     if (totalXp - xpData.spent >= 2) { xpData.spent += 2; updateXpCounters(); }
-    else alert("Pas assez d'XP !");
+    else alert("Pas assez d'XP disponible !");
 }));
 
 document.querySelectorAll('.btn-refund-xp').forEach(btn => btn.addEventListener('click', () => {
@@ -182,16 +176,19 @@ burnBtn.addEventListener('click', () => {
     const resetVal = parseInt(momentumInput.dataset.reset) || 2;
     momentumInput.value = resetVal;
     localStorage.setItem('track-momentum', resetVal);
-    momentumInput.dispatchEvent(new Event('change')); // Met à jour le visuel des cases d'élan
+    momentumInput.dispatchEvent(new Event('change'));
     burnBtn.classList.add('hidden');
 });
 
 function evaluateResult(score, c1, c2) {
     let outcome = "ÉCHEC";
-    if (score > c1 && score > c2) outcome = "COUP FORT !";
-    else if (score > c1 || score > c2) outcome = "COUP FAIBLE";
+    let color = "text-red-700";
+    if (score > c1 && score > c2) { outcome = "COUP FORT"; color = "text-green-700"; }
+    else if (score > c1 || score > c2) { outcome = "COUP FAIBLE"; color = "text-yellow-600"; }
     if (c1 === c2) outcome += " (DOUBLE !)";
+    
     outcomeText.textContent = outcome;
+    outcomeText.className = `font-headline-lg text-4xl uppercase scribble-underline inline-block my-4 text-center w-full ${color}`;
 }
 
 // === 7. QUÊTES & LIENS ===
@@ -212,7 +209,7 @@ function buildBoxesHtml(ticks) {
         if (boxTicks === 1) symbol = '/';
         if (boxTicks === 2) symbol = 'X';
         if (boxTicks === 3) symbol = '*';
-        if (boxTicks === 4) bgClass = 'bg-ink-black';
+        if (boxTicks === 4) { bgClass = 'bg-ink-black text-white'; symbol = '✓'; }
         html += `<div class="progress-box ${bgClass}">${symbol}</div>`;
     }
     return html;
@@ -223,17 +220,17 @@ function renderTracks() {
     tracksContainer.innerHTML = '';
     tracks.forEach((track, index) => {
         const card = document.createElement('div');
-        card.className = 'border-2 border-ink-black p-4 rounded bg-white relative';
+        card.className = 'border-4 border-ink-black p-4 rounded bg-white relative shadow-[4px_4px_0px_0px_#000] mb-4';
         card.innerHTML = `
-            <div class="flex justify-between items-baseline mb-2">
-                <span class="font-scrawl text-2xl">${track.name}</span>
-                <span class="font-label-sm font-bold border border-ink-black px-1.5 text-xs transform rotate-1">${diffLabels[track.diff]}</span>
+            <div class="flex justify-between items-baseline mb-3">
+                <span class="font-headline-lg text-2xl">${track.name}</span>
+                <span class="font-label-md font-bold border-2 border-ink-black px-2 py-0.5 text-xs transform rotate-1 uppercase bg-yellow-100">${diffLabels[track.diff]}</span>
             </div>
-            <div class="flex gap-1.5 flex-wrap mb-4 justify-center">${buildBoxesHtml(track.ticks)}</div>
+            <div class="flex gap-1.5 flex-wrap mb-4 justify-center track-group p-1 border-none shadow-none">${buildBoxesHtml(track.ticks)}</div>
             <div class="flex gap-2">
-                <button onclick="markProgress(${index})" class="border border-ink-black font-scrawl text-lg px-2.5 py-1 rounded bg-white hover:bg-gray-100">+ Progrès</button>
-                <button onclick="resolveProgress(${index})" class="border border-ink-black bg-ink-black text-white font-scrawl text-lg px-2.5 py-1 rounded">Résoudre</button>
-                <button onclick="deleteTrack(${index})" class="text-red-700 font-scrawl text-lg ml-auto">Suppr.</button>
+                <button onclick="markProgress(${index})" class="border-2 border-ink-black font-headline-lg text-lg px-3 py-1 rounded bg-white hover:bg-gray-100 shadow-[2px_2px_0px_0px_#000]">+ Progrès</button>
+                <button onclick="resolveProgress(${index})" class="border-2 border-ink-black bg-ink-black text-white font-headline-lg text-lg px-3 py-1 rounded shadow-[2px_2px_0px_0px_#888] hover:translate-y-1 transition-transform">Résoudre</button>
+                <button onclick="deleteTrack(${index})" class="text-red-700 font-headline-lg text-lg ml-auto hover:underline">Suppr.</button>
             </div>
         `;
         tracksContainer.appendChild(card);
@@ -269,8 +266,9 @@ window.resolveProgress = function(index) {
     if (c1 === c2) outcome += " (DOUBLE !)";
 
     const resBox = document.getElementById('progress-roll-result');
-    resBox.innerHTML = `<p class="font-hand text-xl">Jet pour "${track.name}" : Score ${progressScore} VS [${c1}] & [${c2}]</p>
-                        <p class="font-headline-lg text-3xl uppercase mt-2">${outcome}</p>`;
+    resBox.innerHTML = `<h4 class="font-headline-lg text-xl mb-1 text-gray-700">Jet pour "${track.name}"</h4>
+                        <p class="font-hand text-2xl">Score <span class="font-bold text-3xl">${progressScore}</span> VS [${c1}] & [${c2}]</p>
+                        <p class="font-headline-lg text-4xl uppercase mt-3 text-ink-black">${outcome}</p>`;
     resBox.classList.remove('hidden');
 };
 
@@ -306,16 +304,16 @@ function renderAssets() {
     assetsContainer.innerHTML = '';
     assets.forEach((asset, index) => {
         const card = document.createElement('div');
-        card.className = 'ink-border p-4 bg-white asset-card';
+        card.className = 'border-4 border-ink-black p-4 rounded bg-white relative shadow-[4px_4px_0px_0px_#000]';
         card.innerHTML = `
-            <div class="flex justify-between items-center mb-3">
-                <input type="text" class="a-title font-scrawl text-2xl outline-none border-b-2 border-ink-black w-3/4" placeholder="Nom de l'Atout..." value="${asset.title || ''}">
-                <button onclick="deleteAsset(${index})" class="font-scrawl text-red-700 text-lg">X</button>
+            <div class="flex justify-between items-center mb-4 border-b-2 border-dashed border-gray-300 pb-2">
+                <input type="text" class="a-title font-headline-lg text-2xl outline-none w-3/4 bg-transparent" placeholder="Nom de l'Atout..." value="${asset.title || ''}">
+                <button onclick="deleteAsset(${index})" class="font-headline-lg text-red-700 text-xl hover:scale-110 transition-transform">X</button>
             </div>
             ${[1, 2, 3].map(i => `
-                <div class="flex gap-3 mb-2 items-start">
+                <div class="flex gap-4 mb-3 items-start">
                     <input type="checkbox" class="a-c${i} hand-checkbox mt-1" ${asset['c'+i] ? 'checked' : ''}>
-                    <textarea class="a-t${i} asset-area font-hand text-2xl w-full outline-none border-b border-dashed border-gray-400 bg-transparent resize-none h-14">${asset['t'+i] || ''}</textarea>
+                    <textarea class="a-t${i} asset-area font-hand text-2xl w-full outline-none bg-transparent resize-none h-16 leading-tight">${asset['t'+i] || ''}</textarea>
                 </div>
             `).join('')}
         `;
@@ -333,12 +331,12 @@ renderAssets();
 
 // === 9. REGLES & ORACLE ===
 const movesDatabase = {
-    danger: "<strong>Faire Face au Danger :</strong> Quand vous tentez quelque chose de risqué, décrivez votre approche et lancez 1d6 + votre caractéristique appropriée. <br>• <i>Coup Fort :</i> Vous réussissez. Prenez +1 élan.<br>• <i>Coup Faible :</i> Vous réussissez, mais vous devez payer un prix (-1 Santé, Esprit ou Provisions).<br>• <i>Échec :</i> Le danger se concrétise.",
-    avantage: "<strong>Sécuriser un Avantage :</strong> Vous préparez le terrain. Lancez +Carac.<br>• <i>Coup Fort :</i> Prenez l'avantage ! Prenez +2 Élan ou ajoutez +1 au prochain jet.<br>• <i>Coup Faible :</i> Succès mineur. Prenez +1 Élan.",
-    infos: "<strong>Récolter des Informations :</strong> Vous fouillez un lieu ou questionnez un PNJ. Lancez +Astuce.<br>• <i>Coup Fort :</i> Vous découvrez une vérité utile. Prenez +2 Élan.<br>• <i>Coup Faible :</i> Information partielle, mais le chemin se complique. Prenez +1 Élan.",
-    frapper: "<strong>Frapper :</strong> Attaque offensive en combat. Lancez +Fer (mêlée) ou +Vivacité (distance).<br>• <i>Coup Fort :</i> Infligez vos dégâts (généralement 2) et conservez l'initiative.<br>• <i>Coup Faible :</i> Infligez vos dégâts, mais vous perdez l'initiative.",
-    opposer: "<strong>S'opposer :</strong> Vous parez une attaque ennemie. Lancez +Fer ou +Vivacité.<br>• <i>Coup Fort :</i> Vous esquivez/parez. Prenez l'initiative ou +2 Élan.<br>• <i>Coup Faible :</i> Vous évitez le pire mais perdez l'initiative. Payez le Prix.",
-    voeu: "<strong>Jurer un Vœu de Fer :</strong> Vous lancez une quête sacrée. Lancez +Cœur.<br>• <i>Coup Fort :</i> Vous êtes béni. Prenez +2 Élan.<br>• <i>Coup Faible :</i> Vous commencez, mais un doute ou un obstacle se dresse. Prenez +1 Élan.<br>• <i>Échec :</i> Un obstacle majeur se dresse avant même le départ."
+    danger: "<strong>Faire Face au Danger :</strong> Quand vous tentez quelque chose de risqué, décrivez votre approche et lancez 1d6 + Carac appropriée. <br><br>• <i>Coup Fort :</i> Réussite totale. +1 élan.<br>• <i>Coup Faible :</i> Vous réussissez, mais avec un prix (-1 Santé, Esprit ou Provisions).<br>• <i>Échec :</i> Le danger se concrétise.",
+    avantage: "<strong>Sécuriser un Avantage :</strong> Vous prenez le temps de vous préparer. Lancez +Carac.<br><br>• <i>Coup Fort :</i> Avantage pris ! +2 Élan ou +1 au prochain jet.<br>• <i>Coup Faible :</i> Succès mineur. +1 Élan.",
+    infos: "<strong>Récolter des Informations :</strong> Vous fouillez ou questionnez. Lancez +Astuce.<br><br>• <i>Coup Fort :</i> Vérité utile découverte. +2 Élan.<br>• <i>Coup Faible :</i> Information partielle, complication. +1 Élan.",
+    frapper: "<strong>Frapper :</strong> Attaque avec l'avantage. Lancez +Fer (mêlée) ou +Vivacité (distance).<br><br>• <i>Coup Fort :</i> Infligez les dégâts (min 2). Vous gardez l'initiative.<br>• <i>Coup Faible :</i> Infligez les dégâts, mais vous perdez l'initiative.",
+    opposer: "<strong>S'opposer :</strong> Défense face à une attaque. Lancez +Fer ou +Vivacité.<br><br>• <i>Coup Fort :</i> Esquive/Parade réussie. Reprenez l'initiative ou +2 Élan.<br>• <i>Coup Faible :</i> Vous évitez le pire mais restez sur la défensive. Payez le Prix.",
+    voeu: "<strong>Jurer un Vœu de Fer :</strong> Vous lancez une quête. Lancez +Cœur.<br><br>• <i>Coup Fort :</i> Vous êtes motivé. +2 Élan.<br>• <i>Coup Faible :</i> Vous partez, mais un doute survient. +1 Élan.<br>• <i>Échec :</i> Un obstacle majeur se dresse immédiatement."
 };
 const rulesSelector = document.getElementById('rules-selector');
 const rulesDisplayBox = document.getElementById('rules-display-box');
@@ -349,6 +347,6 @@ document.getElementById('oracle-yes-no-btn').addEventListener('click', () => {
     const roll = Math.floor(Math.random() * 100) + 1;
     let a = roll <= 25 ? "NON" : roll <= 50 ? "Peut-être pas (Non mitigé)" : roll <= 85 ? "OUI" : "OUI ABSOLU !";
     const res = document.getElementById('oracle-res');
-    res.innerHTML = `Résultat : <span class="text-red-800">${roll}</span> ➔ <span class="underline">${a}</span>`;
+    res.innerHTML = `Résultat : <span class="text-ink-black font-bold">${roll}</span> <br>➔ <span class="text-red-800 underline">${a}</span>`;
     res.classList.remove('hidden');
 });
