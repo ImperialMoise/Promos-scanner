@@ -68,6 +68,7 @@
                 </div>
             </div>
         </section>
+        
         <section id="tracks-section">
             <h2>Jauges</h2>
             <div class="tracks-grid">
@@ -88,6 +89,22 @@
                     <input type="number" id="track-momentum" value="2" min="-6" max="10">
                 </div>
             </div>
+        </section>
+
+        <section id="progress-section">
+            <h2>Vœux & Progressions</h2>
+            <div class="progress-controls">
+                <input type="text" id="new-track-name" placeholder="Nom du Vœu, Périple ou Combat..." style="flex: 1;">
+                <select id="new-track-difficulty">
+                    <option value="troublesome">Pénible (+3 cases)</option>
+                    <option value="dangerous">Dangereux (+2 cases)</option>
+                    <option value="formidable">Redoutable (+1 case)</option>
+                    <option value="extreme">Extrême (+2 coches)</option>
+                    <option value="epic">Épique (+1 coche)</option>
+                </select>
+                <button id="add-track-btn">Ajouter</button>
+            </div>
+            <div id="tracks-container"></div>
         </section>
     </main>
 

@@ -216,3 +216,110 @@ h1 {
 #burn-momentum-btn:hover {
     background-color: #e68a00;
 }
+
+/* === SECTION PROGRESSIONS === */
+#progress-section {
+    margin-top: 30px;
+    background-color: #2b2b36;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #3e3e4f;
+    width: 100%;
+    max-width: 500px;
+}
+
+.progress-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.track-card {
+    background-color: #1e1e24;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    border-left: 4px solid #a8a8b3;
+    text-align: left;
+}
+
+.track-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.track-title {
+    font-weight: bold;
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.track-diff {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #ff9800;
+    background-color: #2b2b36;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.boxes-container {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 15px;
+    justify-content: center;
+}
+
+.progress-box {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #5a5a66;
+    background-color: #2b2b36;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #4CAF50;
+    border-radius: 3px;
+}
+
+.progress-box.filled {
+    background-color: #22222b;
+    border-color: #4CAF50;
+}
+
+.track-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.track-actions button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+}
+
+.btn-mark { background-color: #4CAF50; }
+.btn-mark:hover { background-color: #45a049; }
+.btn-resolve { background-color: #2196F3; }
+.btn-resolve:hover { background-color: #0b7dda; }
+.btn-delete { background-color: #F44336; }
+.btn-delete:hover { background-color: #da190b; }
+
+.track-result-box {
+    margin-top: 12px;
+    padding: 10px;
+    background-color: #2b2b36;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.95rem;
+}
