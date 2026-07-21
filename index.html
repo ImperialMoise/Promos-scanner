@@ -1,136 +1,74 @@
 <!DOCTYPE html>
-<html class="light" lang="fr">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>FastOffres — Bons plans food à Bordeaux</title>
-
-  <meta
-    name="description"
-    content="Promos Scanner repère les bons plans fast-food, menus étudiants et offres food autour de Bordeaux."
-  />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Montserrat:wght@700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700;9..40,800;9..40,900&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;700;800&display=swap"
-    rel="stylesheet"
-  />
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            tertiary: "#705d00",
-            "inverse-surface": "#2e3132",
-            "on-secondary-container": "#63627a",
-            outline: "#8e7164",
-            "on-primary": "#ffffff",
-            "surface-container-lowest": "#ffffff",
-            secondary: "#5d5c74",
-            "on-secondary": "#ffffff",
-            "surface-variant": "#e1e3e4",
-            "on-tertiary-fixed-variant": "#544600",
-            "surface-container-high": "#e7e8e9",
-            "on-tertiary": "#ffffff",
-            "error-container": "#ffdad6",
-            "tertiary-fixed": "#ffe16d",
-            "primary-container": "#ff6b00",
-            "on-primary-fixed": "#351000",
-            "on-tertiary-fixed": "#221b00",
-            surface: "#f8f9fa",
-            "tertiary-container": "#c9a900",
-            "surface-dim": "#d9dadb",
-            "surface-container-low": "#f3f4f5",
-            "secondary-fixed": "#e2e0fc",
-            "surface-container-highest": "#e1e3e4",
-            primary: "#a04100",
-            error: "#ba1a1a",
-            "on-error-container": "#93000a",
-            "inverse-on-surface": "#f0f1f2",
-            background: "#f8f9fa",
-            "on-surface": "#191c1d",
-            "primary-fixed-dim": "#ffb693",
-            "on-primary-container": "#572000",
-            "on-secondary-fixed-variant": "#45455b",
-            "secondary-fixed-dim": "#c6c4df",
-            "surface-bright": "#f8f9fa",
-            "surface-container": "#edeeef",
-            "on-background": "#191c1d",
-            "inverse-primary": "#ffb693",
-            "on-surface-variant": "#5a4136",
-            "on-tertiary-container": "#4c3e00",
-            "outline-variant": "#e2bfb0",
-            "secondary-container": "#e2e0fc",
-            "tertiary-fixed-dim": "#e9c400",
-            "surface-tint": "#a04100",
-            "primary-fixed": "#ffdbcc",
-            "on-error": "#ffffff",
-            "on-primary-fixed-variant": "#7a3000",
-            "on-secondary-fixed": "#1a1a2e"
-          },
-          borderRadius: {
-            DEFAULT: "0.25rem",
-            lg: "0.5rem",
-            xl: "0.75rem",
-            full: "9999px"
-          },
-          spacing: {
-            xs: "4px",
-            "container-max": "1200px",
-            lg: "48px",
-            sm: "12px",
-            base: "8px",
-            md: "24px",
-            gutter: "16px"
-          },
-          fontFamily: {
-            "label-sm": ["Inter"],
-            "body-md": ["Inter"],
-            "headline-sm": ["Montserrat"],
-            "display-lg": ["Montserrat"],
-            "display-lg-mobile": ["Montserrat"],
-            "headline-md": ["Montserrat"],
-            "body-lg": ["Inter"],
-            "label-bold": ["Inter"]
-          },
-          fontSize: {
-            "label-sm": ["12px", { lineHeight: "14px", fontWeight: "500" }],
-            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
-            "headline-sm": ["20px", { lineHeight: "26px", fontWeight: "700" }],
-            "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "800" }],
-            "display-lg-mobile": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "800" }],
-            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "700" }],
-            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
-            "label-bold": ["14px", { lineHeight: "16px", fontWeight: "700" }]
-          }
-        }
-      }
-    };
-  </script>
-
-  <link rel="stylesheet" href="styles.css" />
-
-  <script>
-    window.FASTOFFRES_CONFIG = {
-      supabaseUrl: "https://ajcoxowmywfgkyxykwex.supabase.co",
-      supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqY294b3dteXdmZ2t5eHlrd2V4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyODg0NTEsImV4cCI6MjA5Nzg2NDQ1MX0.gDP8ctOQEBO9uGhK9OIu4AocZjbW5SxmVIsXM9YAjnA"
-    };
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ironsworn Companion</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+<body>
+    <header>
+        <h1>Ironsworn</h1>
+        <input type="text" id="char-name" placeholder="Nom du Personnage" />
+    </header>
 
-<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen">
-  <div id="root"></div>
+    <section id="dice-section">
+            <h2>Moteur de Résolution</h2>
+            <div class="roll-controls">
+                <select id="stat-selector">
+                    <option value="edge">Vivacité</option>
+                    <option value="heart">Cœur</option>
+                    <option value="iron">Fer</option>
+                    <option value="wits">Astuce</option>
+                    <option value="shadow">Ombre</option>
+                </select>
+                <input type="number" id="modifier" value="0" title="Ajouts éventuels (+1, +2...)" style="width: 40px;">
+                <button id="roll-btn">Lancer l'Action</button>
+            </div>
+            
+            <div id="roll-result" class="hidden">
+                <div class="dice-display">
+                    <div class="action-die-box">
+                        <span id="action-die-val">0</span> (d6) + <span id="stat-val">0</span> (carac+ajout) = <strong id="action-total">0</strong>
+                    </div>
+                    <div class="vs">CONTRE</div>
+                    <div class="challenge-dice-box">
+                        <span class="challenge-die" id="challenge1">0</span>
+                        <span class="challenge-die" id="challenge2">0</span>
+                    </div>
+                </div>
+                <h3 id="outcome-text">Résultat</h3>
+            </div>
+        </section>
+        
+    <main>
+        <section id="stats-section">
+            <h2>Caractéristiques</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <label>Vivacité</label>
+                    <input type="number" id="stat-edge" value="1" min="1" max="4">
+                </div>
+                <div class="stat-box">
+                    <label>Cœur</label>
+                    <input type="number" id="stat-heart" value="1" min="1" max="4">
+                </div>
+                <div class="stat-box">
+                    <label>Fer</label>
+                    <input type="number" id="stat-iron" value="1" min="1" max="4">
+                </div>
+                <div class="stat-box">
+                    <label>Astuce</label>
+                    <input type="number" id="stat-wits" value="1" min="1" max="4">
+                </div>
+                <div class="stat-box">
+                    <label>Ombre</label>
+                    <input type="number" id="stat-shadow" value="1" min="1" max="4">
+                </div>
+            </div>
+        </section>
+    </main>
 
-  <script type="text/babel" src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

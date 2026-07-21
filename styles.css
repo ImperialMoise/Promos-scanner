@@ -1,48 +1,148 @@
-.material-symbols-outlined {
-  font-family: "Material Symbols Outlined";
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  -webkit-font-feature-settings: "liga";
-  -webkit-font-smoothing: antialiased;
-  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+body {
+    background-color: #1e1e24;
+    color: #f5f5f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+header {
+    text-align: center;
+    margin-bottom: 30px;
 }
 
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+h1 {
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
-.deal-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+#char-name {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #5a5a66;
+    color: white;
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 5px;
 }
 
-.deal-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 4px 4px 0 rgba(93, 92, 116, 0.2);
+#char-name:focus {
+    outline: none;
+    border-bottom-color: #a8a8b3;
 }
 
-.category-card {
-  transition: transform 0.2s ease;
+.stats-grid {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
-.category-card:hover {
-  transform: scale(1.02);
+.stat-box {
+    background-color: #2b2b36;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    width: 80px;
+    border: 1px solid #3e3e4f;
 }
 
-button,
-a,
-input {
-  font: inherit;
+.stat-box label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.stat-box input {
+    width: 50px;
+    font-size: 1.5rem;
+    text-align: center;
+    background-color: #1e1e24;
+    color: white;
+    border: 1px solid #5a5a66;
+    border-radius: 4px;
+}
+
+/* === SECTION DES DÉS === */
+#dice-section {
+    margin-top: 30px;
+    background-color: #2b2b36;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #3e3e4f;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.roll-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.roll-controls select, .roll-controls input, .roll-controls button {
+    padding: 8px;
+    background-color: #1e1e24;
+    color: white;
+    border: 1px solid #5a5a66;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+#roll-btn {
+    background-color: #4a4a59;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#roll-btn:hover {
+    background-color: #5a5a66;
+}
+
+.dice-display {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    background-color: #1e1e24;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.challenge-dice-box {
+    display: flex;
+    gap: 15px;
+}
+
+.challenge-die {
+    background-color: #8b0000;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+    width: 30px;
+    text-align: center;
+    border: 2px solid #ff4c4c;
+}
+
+.vs {
+    font-size: 0.9rem;
+    color: #a8a8b3;
+    font-style: italic;
+}
+
+.hidden {
+    display: none;
 }
