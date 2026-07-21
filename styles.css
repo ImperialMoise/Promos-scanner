@@ -11,7 +11,7 @@ body {
 
 header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 h1 {
@@ -35,31 +35,54 @@ h1 {
     border-bottom-color: #a8a8b3;
 }
 
-.stats-grid {
+/* === STATS & JAUGES === */
+.stats-grid, .tracks-grid {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
     justify-content: center;
 }
 
-.stat-box {
+#stats-section, #tracks-section, #dice-section, #progress-section, #assets-section {
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 500px;
+}
+
+#assets-section {
+    max-width: 600px;
+}
+
+h2 {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #a8a8b3;
+    margin-bottom: 15px;
+}
+
+.stat-box, .track-box {
     background-color: #2b2b36;
-    padding: 15px;
+    padding: 10px 15px;
     border-radius: 8px;
     text-align: center;
     width: 80px;
     border: 1px solid #3e3e4f;
 }
 
-.stat-box label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: bold;
-    font-size: 0.9rem;
-    text-transform: uppercase;
+.track-box.momentum {
+    border-color: #4CAF50;
 }
 
-.stat-box input {
+.stat-box label, .track-box label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #a8a8b3;
+}
+
+.stat-box input, .track-box input {
     width: 50px;
     font-size: 1.5rem;
     text-align: center;
@@ -71,14 +94,11 @@ h1 {
 
 /* === SECTION DES DÉS === */
 #dice-section {
-    margin-top: 30px;
     background-color: #2b2b36;
     padding: 20px;
     border-radius: 8px;
     border: 1px solid #3e3e4f;
     text-align: center;
-    width: 100%;
-    max-width: 500px;
 }
 
 .roll-controls {
@@ -104,9 +124,7 @@ h1 {
     text-transform: uppercase;
 }
 
-#roll-btn:hover {
-    background-color: #5a5a66;
-}
+#roll-btn:hover { background-color: #5a5a66; }
 
 .dice-display {
     display: flex;
@@ -120,10 +138,7 @@ h1 {
     border-radius: 4px;
 }
 
-.challenge-dice-box {
-    display: flex;
-    gap: 15px;
-}
+.challenge-dice-box { display: flex; gap: 15px; }
 
 .challenge-die {
     background-color: #8b0000;
@@ -137,72 +152,12 @@ h1 {
     border: 2px solid #ff4c4c;
 }
 
-.vs {
-    font-size: 0.9rem;
-    color: #a8a8b3;
-    font-style: italic;
-}
-
-.hidden {
-    display: none;
-}
-
-/* === SECTION DES JAUGES === */
-#tracks-section {
-    margin-top: 30px;
-    width: 100%;
-    max-width: 500px;
-}
-
-#tracks-section h2 {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #a8a8b3;
-    margin-bottom: 15px;
-}
-
-.tracks-grid {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.track-box {
-    background-color: #2b2b36;
-    padding: 10px;
-    border-radius: 8px;
-    text-align: center;
-    width: 90px;
-    border: 1px solid #3e3e4f;
-}
-
-.track-box.momentum {
-    border-color: #4CAF50; /* Une bordure verte pour mettre l'Élan en valeur */
-}
-
-.track-box label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    color: #a8a8b3;
-}
-
-.track-box input {
-    width: 50px;
-    font-size: 1.5rem;
-    text-align: center;
-    background-color: #1e1e24;
-    color: white;
-    border: 1px solid #5a5a66;
-    border-radius: 4px;
-}
+.vs { font-size: 0.9rem; color: #a8a8b3; font-style: italic; }
+.hidden { display: none !important; }
 
 #burn-momentum-btn {
     margin-top: 15px;
-    background-color: #ff9800; /* Orange épique */
+    background-color: #ff9800;
     color: #1e1e24;
     font-weight: bold;
     border: none;
@@ -212,27 +167,25 @@ h1 {
     text-transform: uppercase;
     font-size: 0.9rem;
 }
-
-#burn-momentum-btn:hover {
-    background-color: #e68a00;
-}
+#burn-momentum-btn:hover { background-color: #e68a00; }
 
 /* === SECTION PROGRESSIONS === */
 #progress-section {
-    margin-top: 30px;
     background-color: #2b2b36;
     padding: 20px;
     border-radius: 8px;
     border: 1px solid #3e3e4f;
-    width: 100%;
-    max-width: 500px;
 }
 
-.progress-controls {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+.progress-controls { display: flex; gap: 10px; margin-bottom: 20px; }
+.progress-controls input, .progress-controls select, .progress-controls button {
+    padding: 8px;
+    background-color: #1e1e24;
+    color: white;
+    border: 1px solid #5a5a66;
+    border-radius: 4px;
 }
+#add-track-btn { cursor: pointer; font-weight: bold; background-color: #4a4a59; }
 
 .track-card {
     background-color: #1e1e24;
@@ -240,180 +193,52 @@ h1 {
     border-radius: 6px;
     margin-bottom: 15px;
     border-left: 4px solid #a8a8b3;
-    text-align: left;
 }
 
-.track-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.track-title {
-    font-weight: bold;
-    margin: 0;
-    font-size: 1.05rem;
-}
-
+.track-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.track-title { font-weight: bold; margin: 0; font-size: 1.05rem; }
 .track-diff {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: #ff9800;
-    background-color: #2b2b36;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: bold;
+    font-size: 0.75rem; text-transform: uppercase; color: #ff9800;
+    background-color: #2b2b36; padding: 3px 8px; border-radius: 4px; font-weight: bold;
 }
 
-.boxes-container {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 15px;
-    justify-content: center;
-}
-
+.boxes-container { display: flex; gap: 4px; margin-bottom: 15px; justify-content: center; }
 .progress-box {
-    width: 28px;
-    height: 28px;
-    border: 1px solid #5a5a66;
-    background-color: #2b2b36;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    font-weight: bold;
-    color: #4CAF50;
-    border-radius: 3px;
+    width: 28px; height: 28px; border: 1px solid #5a5a66; background-color: #2b2b36;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: bold; color: #4CAF50; border-radius: 3px;
 }
+.progress-box.filled { background-color: #22222b; border-color: #4CAF50; }
 
-.progress-box.filled {
-    background-color: #22222b;
-    border-color: #4CAF50;
-}
+.track-actions { display: flex; gap: 8px; justify-content: space-between; }
+.track-actions button { padding: 6px 12px; font-size: 0.85rem; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; }
+.btn-mark { background-color: #4CAF50; } .btn-mark:hover { background-color: #45a049; }
+.btn-resolve { background-color: #2196F3; } .btn-resolve:hover { background-color: #0b7dda; }
+.btn-delete { background-color: #F44336; } .btn-delete:hover { background-color: #da190b; }
 
-.track-actions {
-    display: flex;
-    gap: 8px;
-    justify-content: space-between;
-}
-
-.track-actions button {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-    font-weight: bold;
-}
-
-.btn-mark { background-color: #4CAF50; }
-.btn-mark:hover { background-color: #45a049; }
-.btn-resolve { background-color: #2196F3; }
-.btn-resolve:hover { background-color: #0b7dda; }
-.btn-delete { background-color: #F44336; }
-.btn-delete:hover { background-color: #da190b; }
-
-.track-result-box {
-    margin-top: 12px;
-    padding: 10px;
-    background-color: #2b2b36;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 0.95rem;
-}
+.track-result-box { margin-top: 12px; padding: 10px; background-color: #2b2b36; border-radius: 4px; text-align: center; font-size: 0.95rem; }
 
 /* === SECTION ATOUTS === */
-#assets-section {
-    margin-top: 30px;
-    width: 100%;
-    max-width: 600px; /* Un peu plus large pour les cartes */
-}
+.assets-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #3e3e4f; padding-bottom: 10px; }
+#add-asset-btn { background-color: #4CAF50; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.assets-grid { display: flex; flex-direction: column; gap: 15px; }
 
-.assets-header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #3e3e4f;
-    padding-bottom: 10px;
-}
+.asset-card { background-color: #2b2b36; border: 1px solid #5a5a66; border-radius: 8px; padding: 15px; }
+.asset-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+.asset-title { background: transparent; border: none; border-bottom: 2px solid #5a5a66; color: white; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; width: 80%; }
+.asset-ability { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+.asset-ability input[type="checkbox"] { margin-top: 5px; transform: scale(1.3); cursor: pointer; }
+.asset-ability textarea { flex: 1; background-color: #1e1e24; color: #f5f5f5; border: 1px solid #3e3e4f; border-radius: 4px; padding: 8px; resize: vertical; min-height: 40px; font-family: inherit; font-size: 0.9rem; }
 
-.assets-header-container h2 {
-    margin: 0;
-    color: #a8a8b3;
-}
+/* === SYSTEME D'ONGLETS === */
+.tabs-nav { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 500px; }
+.tab-btn { flex: 1; padding: 12px; background-color: #2b2b36; color: #a8a8b3; border: 1px solid #3e3e4f; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
+.tab-btn.active { background-color: #4a4a59; color: white; border-color: #5a5a66; }
+.tab-content { display: none; width: 100%; flex-direction: column; align-items: center; }
+.tab-content.active { display: flex; }
 
-#add-asset-btn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-#add-asset-btn:hover { background-color: #45a049; }
-
-.assets-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.asset-card {
-    background-color: #2b2b36;
-    border: 1px solid #5a5a66;
-    border-radius: 8px;
-    padding: 15px;
-}
-
-.asset-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-}
-
-.asset-title {
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid #5a5a66;
-    color: white;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    width: 80%;
-}
-
-.asset-title:focus {
-    outline: none;
-    border-bottom-color: #ff9800;
-}
-
-.asset-ability {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    margin-bottom: 10px;
-}
-
-.asset-ability input[type="checkbox"] {
-    margin-top: 5px;
-    transform: scale(1.3);
-    cursor: pointer;
-}
-
-.asset-ability textarea {
-    flex: 1;
-    background-color: #1e1e24;
-    color: #f5f5f5;
-    border: 1px solid #3e3e4f;
-    border-radius: 4px;
-    padding: 8px;
-    resize: vertical;
-    min-height: 40px;
-    font-family: inherit;
-    font-size: 0.9rem;
-}
+/* === AIDE MEMOIRE === */
+.help-section { background-color: #2b2b36; padding: 20px; border-radius: 8px; border: 1px solid #3e3e4f; width: 100%; max-width: 500px; margin-bottom: 20px; text-align: left; }
+.help-card { background-color: #1e1e24; padding: 12px; border-radius: 6px; margin-bottom: 10px; border-left: 3px solid #ff9800; }
+.help-card strong { color: #ff9800; display: block; margin-bottom: 5px; }
+.help-card p { margin: 0; font-size: 0.9rem; color: #f5f5f5; line-height: 1.4; }

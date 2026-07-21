@@ -1,21 +1,21 @@
-// === 1. SAUVEGARDE ET CHARGEMENT (LocalStorage) ===
-// On cible tous les champs de texte et de nombres
-const inputs = document.querySelectorAll('input');
+// === 1. SAUVEGARDE ET CHARGEMENT DE BASE (LocalStorage) ===
+const inputs = document.querySelectorAll('input[type="number"], input[type="text"]');
 
 inputs.forEach(input => {
-    // A. Charger les données si elles existent déjà
-    const savedValue = localStorage.getItem(input.id);
-    if (savedValue !== null) {
-        input.value = savedValue;
+    // Éviter de cibler les inputs générés dynamiquement sans ID
+    if (input.id) {
+        const savedValue = localStorage.getItem(input.id);
+        if (savedValue !== null) {
+            input.value = savedValue;
+        }
+        
+        input.addEventListener('input', () => {
+            localStorage.setItem(input.id, input.value);
+        });
     }
-    
-    // B. Sauvegarder automatiquement à chaque fois qu'on tape ou change un chiffre
-    input.addEventListener('input', () => {
-        localStorage.setItem(input.id, input.value);
-    });
 });
 
-// === 2. MOTEUR DE RÉSOLUTION IRONSWORN ===
+// === 2. MOTEUR DE RÉSOLUTION ET ÉLAN ===
 const rollBtn = document.getElementById('roll-btn');
 const rollResult = document.getElementById('roll-result');
 const outcomeText = document.getElementById('outcome-text');
@@ -31,9 +31,7 @@ rollBtn.addEventListener('click', () => {
     const challenge2 = Math.floor(Math.random() * 10) + 1; // 1d10
 
     let actionScore = actionDie + statValue + modifier;
-    if (actionScore > 10) {
-        actionScore = 10;
-    }
+    if (actionScore > 10) actionScore = 10;
 
     document.getElementById('action-die-val').textContent = actionDie;
     document.getElementById('stat-val').textContent = statValue + modifier;
@@ -43,7 +41,7 @@ rollBtn.addEventListener('click', () => {
 
     evaluateResult(actionScore, challenge1, challenge2);
     
-    // Vérifier si l'on peut brûler l'élan (seulement si l'élan est supérieur au score d'action)
+    // Vérification pour brûler l'élan
     const currentMomentum = parseInt(document.getElementById('track-momentum').value) || 0;
     if (currentMomentum > actionScore) {
         burnBtn.classList.remove('hidden');
@@ -54,65 +52,47 @@ rollBtn.addEventListener('click', () => {
     rollResult.classList.remove('hidden');
 });
 
-// === 3. BRÛLER L'ÉLAN ===
 burnBtn.addEventListener('click', () => {
     const currentMomentum = parseInt(document.getElementById('track-momentum').value) || 0;
     const c1 = parseInt(document.getElementById('challenge1').textContent);
     const c2 = parseInt(document.getElementById('challenge2').textContent);
 
-    // L'élan remplace le score d'action
     document.getElementById('action-total').textContent = currentMomentum;
     document.getElementById('action-die-val').textContent = "ÉLAN";
     document.getElementById('stat-val').textContent = "BRÛLÉ";
 
     evaluateResult(currentMomentum, c1, c2);
 
-    // Réinitialisation de l'élan à +2 (valeur de base) et sauvegarde automatique
     const momentumInput = document.getElementById('track-momentum');
-    momentumInput.value = 2;
+    momentumInput.value = 2; // Réinitialisation de base
     localStorage.setItem('track-momentum', 2);
 
-    // On cache le bouton après l'avoir utilisé
     burnBtn.classList.add('hidden');
 });
 
-// Fonction utilitaire pour éviter de répéter le code de calcul
 function evaluateResult(score, c1, c2) {
     let outcome = "";
     let color = "";
     
     if (score > c1 && score > c2) {
-        outcome = "Coup Fort !";
-        color = "#4CAF50"; 
+        outcome = "Coup Fort !"; color = "#4CAF50"; 
     } else if (score > c1 || score > c2) {
-        outcome = "Coup Faible";
-        color = "#FFC107"; 
+        outcome = "Coup Faible"; color = "#FFC107"; 
     } else {
-        outcome = "Échec";
-        color = "#F44336"; 
+        outcome = "Échec"; color = "#F44336"; 
     }
 
-    if (c1 === c2) {
-        outcome += " — DOUBLE ! (Rebondissement)";
-    }
+    if (c1 === c2) outcome += " — DOUBLE ! (Rebondissement)";
 
     outcomeText.textContent = outcome;
     outcomeText.style.color = color;
 }
 
-// === 4. GESTION DES PROGRESSIONS (VŒUX / PÉRIPILES) ===
+// === 3. GESTION DES PROGRESSIONS (VŒUX / PÉRIPILES) ===
 let tracks = JSON.parse(localStorage.getItem('ironsworn-tracks')) || [];
-
 const tracksContainer = document.getElementById('tracks-container');
 const addTrackBtn = document.getElementById('add-track-btn');
-
-const diffLabels = {
-    troublesome: 'Pénible',
-    dangerous: 'Dangereux',
-    formidable: 'Redoutable',
-    extreme: 'Extrême',
-    epic: 'Épique'
-};
+const diffLabels = { troublesome: 'Pénible', dangerous: 'Dangereux', formidable: 'Redoutable', extreme: 'Extrême', epic: 'Épique' };
 
 function saveTracks() {
     localStorage.setItem('ironsworn-tracks', JSON.stringify(tracks));
@@ -125,15 +105,11 @@ function renderTracks() {
         const card = document.createElement('div');
         card.className = 'track-card';
         
-        // Construction visuelle des 10 cases (40 coches au total max)
         let boxesHtml = '';
         for (let i = 0; i < 10; i++) {
             let boxTicks = 0;
-            if (track.ticks >= (i + 1) * 4) {
-                boxTicks = 4;
-            } else if (track.ticks > i * 4) {
-                boxTicks = track.ticks % 4;
-            }
+            if (track.ticks >= (i + 1) * 4) boxTicks = 4;
+            else if (track.ticks > i * 4) boxTicks = track.ticks % 4;
             
             let symbol = '';
             if (boxTicks === 1) symbol = '¼';
@@ -167,15 +143,8 @@ function renderTracks() {
 addTrackBtn.addEventListener('click', () => {
     const nameInput = document.getElementById('new-track-name');
     const diffSelect = document.getElementById('new-track-difficulty');
-    
     if (!nameInput.value.trim()) return;
-
-    tracks.push({
-        name: nameInput.value.trim(),
-        diff: diffSelect.value,
-        ticks: 0
-    });
-
+    tracks.push({ name: nameInput.value.trim(), diff: diffSelect.value, ticks: 0 });
     nameInput.value = '';
     saveTracks();
 });
@@ -183,14 +152,11 @@ addTrackBtn.addEventListener('click', () => {
 window.markProgress = function(index) {
     const track = tracks[index];
     let amount = 0;
-    
-    // Règles officielles d'Ironsworn pour marquer un progrès
-    if (track.diff === 'troublesome') amount = 12; // 3 cases pleines
-    if (track.diff === 'dangerous') amount = 8;    // 2 cases pleines
-    if (track.diff === 'formidable') amount = 4;   // 1 case pleine
-    if (track.diff === 'extreme') amount = 2;      // 2 coches (demi-case)
-    if (track.diff === 'epic') amount = 1;         // 1 coche (quart de case)
-
+    if (track.diff === 'troublesome') amount = 12;
+    if (track.diff === 'dangerous') amount = 8;
+    if (track.diff === 'formidable') amount = 4;
+    if (track.diff === 'extreme') amount = 2;
+    if (track.diff === 'epic') amount = 1;
     track.ticks = Math.min(40, track.ticks + amount);
     saveTracks();
 };
@@ -205,63 +171,43 @@ window.deleteTrack = function(index) {
 window.resolveProgress = function(index) {
     const track = tracks[index];
     const progressScore = Math.floor(track.ticks / 4);
-    
-    // Jet de Progrès : Uniquement 2d10 contre le score actuel
     const c1 = Math.floor(Math.random() * 10) + 1;
     const c2 = Math.floor(Math.random() * 10) + 1;
     
-    let outcome = "";
-    let color = "";
+    let outcome = ""; let color = "";
+    if (progressScore > c1 && progressScore > c2) { outcome = "Coup Fort !"; color = "#4CAF50"; } 
+    else if (progressScore > c1 || progressScore > c2) { outcome = "Coup Faible"; color = "#FFC107"; } 
+    else { outcome = "Échec"; color = "#F44336"; }
     
-    if (progressScore > c1 && progressScore > c2) {
-        outcome = "Coup Fort !";
-        color = "#4CAF50";
-    } else if (progressScore > c1 || progressScore > c2) {
-        outcome = "Coup Faible";
-        color = "#FFC107";
-    } else {
-        outcome = "Échec";
-        color = "#F44336";
-    }
-    
-    if (c1 === c2) {
-        outcome += " — DOUBLE ! (Rebondissement)";
-    }
+    if (c1 === c2) outcome += " — DOUBLE ! (Rebondissement)";
 
     const resDiv = document.getElementById(`track-res-${index}`);
-    resDiv.innerHTML = `Score de Progrès : <strong>${progressScore}</strong> CONTRE <strong>${c1}</strong> et <strong>${c2}</strong><br><span style="color:${color}; font-weight:bold; display:inline-block; margin-top:5px;">${outcome}</span>`;
+    resDiv.innerHTML = `Score : <strong>${progressScore}</strong> CONTRE <strong>${c1}</strong> et <strong>${c2}</strong><br><span style="color:${color}; font-weight:bold; display:inline-block; margin-top:5px;">${outcome}</span>`;
     resDiv.classList.remove('hidden');
 };
+renderTracks();
 
-// === 5. DECK D'ATOUTS ===
+// === 4. DECK D'ATOUTS ===
 let assets = JSON.parse(localStorage.getItem('ironsworn-assets')) || [];
 const assetsContainer = document.getElementById('assets-container');
 const addAssetBtn = document.getElementById('add-asset-btn');
 
-// Fonction qui lit l'écran et sauvegarde silencieusement en mémoire
 function saveAssets() {
     const assetCards = document.querySelectorAll('.asset-card');
     let updatedAssets = [];
-    
     assetCards.forEach(card => {
         updatedAssets.push({
             title: card.querySelector('.asset-title').value,
-            ab1Text: card.querySelector('.ab1-text').value,
-            ab1Checked: card.querySelector('.ab1-check').checked,
-            ab2Text: card.querySelector('.ab2-text').value,
-            ab2Checked: card.querySelector('.ab2-check').checked,
-            ab3Text: card.querySelector('.ab3-text').value,
-            ab3Checked: card.querySelector('.ab3-check').checked
+            ab1Text: card.querySelector('.ab1-text').value, ab1Checked: card.querySelector('.ab1-check').checked,
+            ab2Text: card.querySelector('.ab2-text').value, ab2Checked: card.querySelector('.ab2-check').checked,
+            ab3Text: card.querySelector('.ab3-text').value, ab3Checked: card.querySelector('.ab3-check').checked
         });
     });
-    
     localStorage.setItem('ironsworn-assets', JSON.stringify(updatedAssets));
 }
 
-// Fonction pour dessiner les cartes à l'écran
 function renderAssets() {
     assetsContainer.innerHTML = '';
-    
     assets.forEach((asset, index) => {
         const card = document.createElement('div');
         card.className = 'asset-card';
@@ -283,25 +229,20 @@ function renderAssets() {
                 <textarea class="ab3-text" placeholder="Troisième capacité...">${asset.ab3Text || ''}</textarea>
             </div>
         `;
-        
-        // On écoute chaque modification (texte ou case cochée) pour déclencher la sauvegarde
         card.querySelectorAll('input, textarea').forEach(el => {
             el.addEventListener('input', saveAssets);
             el.addEventListener('change', saveAssets);
         });
-        
         assetsContainer.appendChild(card);
     });
 }
 
-// Bouton pour ajouter une carte vide
 addAssetBtn.addEventListener('click', () => {
     assets.push({ title: '', ab1Text: '', ab1Checked: false, ab2Text: '', ab2Checked: false, ab3Text: '', ab3Checked: false });
     renderAssets();
     saveAssets();
 });
 
-// Bouton pour supprimer une carte
 window.deleteAsset = function(index) {
     if (confirm('Voulez-vous vraiment supprimer cet atout de votre deck ?')) {
         assets.splice(index, 1);
@@ -309,7 +250,29 @@ window.deleteAsset = function(index) {
         renderAssets();
     }
 };
-
-// Initialisation au lancement
 renderAssets();
 
+// === 5. LOGIQUE DES ONGLETS ===
+window.switchTab = function(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.getAttribute('onclick').includes(tabId));
+    if (targetBtn) targetBtn.classList.add('active');
+};
+
+// === 6. ORACLE OUI/NON ===
+const oracleBtn = document.getElementById('oracle-yes-no-btn');
+const oracleRes = document.getElementById('oracle-res');
+
+oracleBtn.addEventListener('click', () => {
+    const roll = Math.floor(Math.random() * 100) + 1;
+    let answer = "";
+    if (roll <= 25) answer = `Résultat : ${roll} ➔ NON`;
+    else if (roll <= 50) answer = `Résultat : ${roll} ➔ Un Non mitigé`;
+    else if (roll <= 85) answer = `Résultat : ${roll} ➔ OUI`;
+    else answer = `Résultat : ${roll} ➔ OUI ABSOLU !`;
+    
+    oracleRes.textContent = answer;
+    oracleRes.classList.remove('hidden');
+});

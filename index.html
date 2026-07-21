@@ -12,109 +12,150 @@
         <input type="text" id="char-name" placeholder="Nom du Personnage" />
     </header>
 
-    <section id="dice-section">
-            <h2>Moteur de Résolution</h2>
-            <div class="roll-controls">
-                <select id="stat-selector">
-                    <option value="edge">Vivacité</option>
-                    <option value="heart">Cœur</option>
-                    <option value="iron">Fer</option>
-                    <option value="wits">Astuce</option>
-                    <option value="shadow">Ombre</option>
-                </select>
-                <input type="number" id="modifier" value="0" title="Ajouts éventuels (+1, +2...)" style="width: 40px;">
-                <button id="roll-btn">Lancer l'Action</button>
-            </div>
-            
-            <div id="roll-result" class="hidden">
-                <div class="dice-display">
-                    <div class="action-die-box">
-                        <span id="action-die-val">0</span> (d6) + <span id="stat-val">0</span> (carac+ajout) = <strong id="action-total">0</strong>
-                    </div>
-                    <div class="vs">CONTRE</div>
-                    <div class="challenge-dice-box">
-                        <span class="challenge-die" id="challenge1">0</span>
-                        <span class="challenge-die" id="challenge2">0</span>
-                    </div>
-                </div>
-                <h3 id="outcome-text">Résultat</h3>
-                <button id="burn-momentum-btn" class="hidden">Brûler l'Élan !</button>
-            </div>
-        </section>
+    <div class="tabs-nav">
+        <button class="tab-btn active" onclick="switchTab('character-tab')">Fiche de Personnage</button>
+        <button class="tab-btn" onclick="switchTab('help-tab')">Aide-Mémoire & Oracles</button>
+    </div>
 
     <main>
-        <section id="stats-section">
-            <h2>Caractéristiques</h2>
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <label>Vivacité</label>
-                    <input type="number" id="stat-edge" value="1" min="1" max="4">
+        <div id="character-tab" class="tab-content active">
+            
+            <section id="stats-section">
+                <h2>Caractéristiques</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <label>Vivacité</label>
+                        <input type="number" id="stat-edge" value="1" min="1" max="4">
+                    </div>
+                    <div class="stat-box">
+                        <label>Cœur</label>
+                        <input type="number" id="stat-heart" value="1" min="1" max="4">
+                    </div>
+                    <div class="stat-box">
+                        <label>Fer</label>
+                        <input type="number" id="stat-iron" value="1" min="1" max="4">
+                    </div>
+                    <div class="stat-box">
+                        <label>Astuce</label>
+                        <input type="number" id="stat-wits" value="1" min="1" max="4">
+                    </div>
+                    <div class="stat-box">
+                        <label>Ombre</label>
+                        <input type="number" id="stat-shadow" value="1" min="1" max="4">
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <label>Cœur</label>
-                    <input type="number" id="stat-heart" value="1" min="1" max="4">
-                </div>
-                <div class="stat-box">
-                    <label>Fer</label>
-                    <input type="number" id="stat-iron" value="1" min="1" max="4">
-                </div>
-                <div class="stat-box">
-                    <label>Astuce</label>
-                    <input type="number" id="stat-wits" value="1" min="1" max="4">
-                </div>
-                <div class="stat-box">
-                    <label>Ombre</label>
-                    <input type="number" id="stat-shadow" value="1" min="1" max="4">
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="tracks-section">
-            <h2>Jauges</h2>
-            <div class="tracks-grid">
-                <div class="track-box">
-                    <label>Santé</label>
-                    <input type="number" id="track-health" value="5" min="0" max="5">
+            <section id="tracks-section">
+                <h2>Jauges</h2>
+                <div class="tracks-grid">
+                    <div class="track-box">
+                        <label>Santé</label>
+                        <input type="number" id="track-health" value="5" min="0" max="5">
+                    </div>
+                    <div class="track-box">
+                        <label>Esprit</label>
+                        <input type="number" id="track-spirit" value="5" min="0" max="5">
+                    </div>
+                    <div class="track-box">
+                        <label>Provisions</label>
+                        <input type="number" id="track-supply" value="5" min="0" max="5">
+                    </div>
+                    <div class="track-box momentum">
+                        <label>Élan</label>
+                        <input type="number" id="track-momentum" value="2" min="-6" max="10">
+                    </div>
                 </div>
-                <div class="track-box">
-                    <label>Esprit</label>
-                    <input type="number" id="track-spirit" value="5" min="0" max="5">
-                </div>
-                <div class="track-box">
-                    <label>Provisions</label>
-                    <input type="number" id="track-supply" value="5" min="0" max="5">
-                </div>
-                <div class="track-box momentum">
-                    <label>Élan</label>
-                    <input type="number" id="track-momentum" value="2" min="-6" max="10">
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="progress-section">
-            <h2>Vœux & Progressions</h2>
-            <div class="progress-controls">
-                <input type="text" id="new-track-name" placeholder="Nom du Vœu, Périple ou Combat..." style="flex: 1;">
-                <select id="new-track-difficulty">
-                    <option value="troublesome">Pénible (+3 cases)</option>
-                    <option value="dangerous">Dangereux (+2 cases)</option>
-                    <option value="formidable">Redoutable (+1 case)</option>
-                    <option value="extreme">Extrême (+2 coches)</option>
-                    <option value="epic">Épique (+1 coche)</option>
-                </select>
-                <button id="add-track-btn">Ajouter</button>
-            </div>
-            <div id="tracks-container"></div>
-        </section>
+            <section id="dice-section">
+                <h2>Moteur de Résolution</h2>
+                <div class="roll-controls">
+                    <select id="stat-selector">
+                        <option value="edge">Vivacité</option>
+                        <option value="heart">Cœur</option>
+                        <option value="iron">Fer</option>
+                        <option value="wits">Astuce</option>
+                        <option value="shadow">Ombre</option>
+                    </select>
+                    <input type="number" id="modifier" value="0" title="Ajouts éventuels (+1, +2...)" style="width: 40px;">
+                    <button id="roll-btn">Lancer l'Action</button>
+                </div>
+                
+                <div id="roll-result" class="hidden">
+                    <div class="dice-display">
+                        <div class="action-die-box">
+                            <span id="action-die-val">0</span> (d6) + <span id="stat-val">0</span> (carac+ajout) = <strong id="action-total">0</strong>
+                        </div>
+                        <div class="vs">CONTRE</div>
+                        <div class="challenge-dice-box">
+                            <span class="challenge-die" id="challenge1">0</span>
+                            <span class="challenge-die" id="challenge2">0</span>
+                        </div>
+                    </div>
+                    <h3 id="outcome-text">Résultat</h3>
+                    <button id="burn-momentum-btn" class="hidden">Brûler l'Élan !</button>
+                </div>
+            </section>
 
-        <section id="assets-section">
-            <div class="assets-header-container">
-                <h2>Deck d'Atouts</h2>
-                <button id="add-asset-btn">+ Nouvel Atout</button>
-            </div>
-            <div id="assets-container" class="assets-grid"></div>
-        </section>
-        
+            <section id="progress-section">
+                <h2>Vœux & Progressions</h2>
+                <div class="progress-controls">
+                    <input type="text" id="new-track-name" placeholder="Nom du Vœu, Périple ou Combat..." style="flex: 1;">
+                    <select id="new-track-difficulty">
+                        <option value="troublesome">Pénible (+3 cases)</option>
+                        <option value="dangerous">Dangereux (+2 cases)</option>
+                        <option value="formidable">Redoutable (+1 case)</option>
+                        <option value="extreme">Extrême (+2 coches)</option>
+                        <option value="epic">Épique (+1 coche)</option>
+                    </select>
+                    <button id="add-track-btn">Ajouter</button>
+                </div>
+                <div id="tracks-container"></div>
+            </section>
+
+            <section id="assets-section">
+                <div class="assets-header-container">
+                    <h2>Deck d'Atouts</h2>
+                    <button id="add-asset-btn">+ Nouvel Atout</button>
+                </div>
+                <div id="assets-container" class="assets-grid"></div>
+            </section>
+
+        </div>
+
+        <div id="help-tab" class="tab-content">
+            <section class="help-section">
+                <h2>Les Actions Courantes (Quand lancer les dés ?)</h2>
+                <div class="help-card">
+                    <strong>Faire Face au Danger</strong>
+                    <p>Action universelle quand tu tentes quelque chose de risqué ou que tu évites une menace. Lance +caractéristique selon ton approche (Vivacité pour la vitesse, Fer pour la force, Astuce pour la ruse, Coeur pour le courage, Ombre pour la discrétion).</p>
+                </div>
+                <div class="help-card">
+                    <strong>Sécuriser un Avantage</strong>
+                    <p>Tu te prépares, tu observes ou tu tentes de prendre le dessus avant d'agir. En cas de succès, tu gagnes de l'Élan ou un bonus sur ton prochain jet.</p>
+                </div>
+                <div class="help-card">
+                    <strong>Récolter des Informations</strong>
+                    <p>Tu fouilles un lieu, tu questionnes un PNJ ou tu suis une piste. S'effectue généralement avec l'Astuce.</p>
+                </div>
+                <div class="help-card">
+                    <strong>Frapper</strong>
+                    <p>Tu attaques au corps-à-corps (Fer) ou à distance (Vivacité) et tu as l'avantage. Si tu réussis, tu infliges des dégâts (progrès).</p>
+                </div>
+                <div class="help-card">
+                    <strong>S'opposer</strong>
+                    <p>Tu es sur la défensive dans un combat et tu réponds à une attaque. Lance +Fer (corps-à-corps) ou +Vivacité (tir/esquive).</p>
+                </div>
+            </section>
+
+            <section class="help-section">
+                <h2>L'Oracle de Base (Générateur d'idées)</h2>
+                <p>Une question fermée sur le monde ? "Le PNJ est-il amical ?", "La porte est-elle verrouillée ?"<br>Mets le modificateur de dés à 0 et clique ci-dessous pour simuler un jet de d100 (deux d10) :</p>
+                <button id="oracle-yes-no-btn" style="background-color: #2196F3; color:white; border:none; padding:10px; border-radius:4px; cursor:pointer; font-weight:bold; width: 100%; margin-top: 10px;">Consulter l'Oracle (Oui/Non)</button>
+                <div id="oracle-res" class="hidden" style="margin-top:15px; background-color:#1e1e24; padding:15px; border-radius:4px; font-weight:bold; color:#ff9800; text-align: center; font-size: 1.1rem;"></div>
+            </section>
+        </div>
     </main>
 
     <script src="script.js"></script>
